@@ -1,8 +1,8 @@
 
-# Ejercicio 5: Determinar si un número es par o impar
-num = int(input("Ingrese un número: "))
+# Ejercicio 6: Determinar si un estudiante aprobo o no considerando nota definitiva
+nota = int(input("Ingrese la nota: "))
 
-if num % 2 == 0:
-    print(f"El número {num} es par.")
+if nota <= 3.0:
+  print("Si aprobo")
 else:
-    print(f"El número {num} es impar.")
+  print("No aprobo")
