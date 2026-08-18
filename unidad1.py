@@ -1,10 +1,8 @@
 
-# Ejercicio 4: Contar cuántas personas son mayores de edad
-edades = [23, 12, 48, 15, 11, 10]
+# Ejercicio 5: Determinar si un número es par o impar
+num = int(input("Ingrese un número: "))
 
-count = 0
-for edad in edades:
-    if edad >= 18:
-        count += 1
-
-print("Número de personas mayores de edad:", count)
+if num % 2 == 0:
+    print(f"El número {num} es par.")
+else:
+    print(f"El número {num} es impar.")
