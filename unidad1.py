@@ -1,8 +1,12 @@
 
-# Ejercicio 2: Determinar si un año es bisiesto
-year= int(input("Ingrese el año: "))
+# Ejercicio 3: Clasificar una nota
+note= float(input("Ingrese la nota: "))
 
-if year % 4 == 0 and (year % 100 != 0 or year % 400 == 0):
-    print(year, "es un año bisiesto")
+if note >= 4.0:
+    print("Alta")
+
+elif note >= 3.0 and note < 3.9:
+    print("Media")
+
 else:
-    print(year, "no es un año bisiesto")
+    print("Baja")
