@@ -1,10 +1,10 @@
-#ejercicio1:
 
+#ejercicio1:
 numero=int(input("ingresar un numero entero: "))
 if numero % 2 ==0:
-    print("el numero {numero} es par")
+    print(f"el numero {numero} es par")
 else:
-    print("el numero {numero} es impar")
+    print(f"el numero {numero} es impar")
 
 #ejercicio2:
 nota=float(input("ingresar la nota del estudiante: "))
@@ -35,9 +35,4 @@ if medicion>= 40:
 else:
    print("es normal")  
      
-
-
-
-
-
 
