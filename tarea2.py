@@ -35,7 +35,8 @@ for i in range(1, numero_de_personas + 1):
 print(f"el numero de personas mayores de edad es {contador}")
 
 #pdf
-import PyPDF2
+
+
 
 
  
