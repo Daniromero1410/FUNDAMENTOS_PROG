@@ -1,0 +1,9 @@
+n = int(input("Ingrese la cantidad de edades: "))
+mayores = 0
+
+for i in range(n):
+    edad = int(input("Ingrese una edad: "))
+    if edad >= 18:
+        mayores += 1
+
+print(f"Personas mayores de edad: {mayores}")
