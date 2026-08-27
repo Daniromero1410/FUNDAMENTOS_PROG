@@ -1,0 +1,7 @@
+nota = float(input("Ingrese la nota: "))
+asistencia = float(input("Ingrese la asistencia: "))
+
+if nota >= 3 and asistencia >= 0.8:
+	print("Aprobó")
+else:
+	print("No aprobó")

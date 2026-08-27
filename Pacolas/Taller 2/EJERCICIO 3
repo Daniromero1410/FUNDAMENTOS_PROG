@@ -1,0 +1,8 @@
+temperatura = float(input("Ingrese la temperatura: "))
+
+if temperatura < 15:
+	print("FRIO")
+elif temperatura <= 25:
+	print("templado")
+else:
+	print("caliente")
