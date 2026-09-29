@@ -1,0 +1,8 @@
+notas = [2.5, 3.0, 4.2, 2.8, 3.7]
+cantidad = 0
+
+for nota in notas:
+	if nota >= 3:
+		cantidad += 1
+
+print("Cantidad de notas mayores o iguales a 3:", cantidad)

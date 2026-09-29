@@ -1,0 +1,5 @@
+numero = 1
+
+while numero <= 9:
+	numero += 1
+	print(numero)

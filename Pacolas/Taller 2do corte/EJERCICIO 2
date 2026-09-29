@@ -1,0 +1,7 @@
+numero = int(input("Ingrese un número: "))
+contador = 1
+
+while contador <= 9:
+	contador += 1
+	print(numero * contador)
+	
