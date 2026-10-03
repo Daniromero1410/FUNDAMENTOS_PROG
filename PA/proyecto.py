@@ -2,6 +2,8 @@
 #Primera entrega del proyecto de Fundamentos de Programación
 #--------------------------------------------------------------------------------------------------------------------------------------------
 
+import os
+
 #Catalogo de productos (definido desde el inicio)
 #Precio en USD
 catalogo = {
@@ -14,6 +16,15 @@ catalogo = {
 
 #carrito de compras (inicialmente vacío)
 carrito = []
+
+# Limpiar la consola (cls en Windows, clear en Mac y Linux)
+def limpiar_pantalla():
+    os.system('cls' if os.name == 'nt' else 'clear')
+ 
+#--------------------------------------------------------------------------------------------------------------------------------------------
+# Pausa para que el usuario alcance a leer antes de volver al menú
+def pausar():
+    input("\nPresiona Enter para continuar...")
 
 #--------------------------------------------------------------------------------------------------------------------------------------------
 # Mostrar catalogo con ciclo for
@@ -79,17 +90,24 @@ def facturar():
 
 #menu principal
 def menu_principal():
+    limpiar_pantalla()
     print("\n--- ¡Bienvenido a nuestra tienda virtual!  ---")
+    pausar()
 
     while True:
+        # Cada vuelta empieza con la pantalla limpia y solo el menú
+        limpiar_pantalla()
         print("\n--- MENÚ PRINCIPAL ---")
         print("1. Mostrar catálogo")
         print("2. Comprar")
         print("3. Ver carrito")
         print("4. Pagar y salir")
-
-        opcion = input("Seleccione una opción (1-4): ")
-
+ 
+        opcion = input("\nSeleccione una opción (1-4): ")
+ 
+        # Se limpia otra vez para que el resultado se vea solo, sin el menú encima
+        limpiar_pantalla()
+ 
         if opcion == "1":
             mostrar_catalogo()
         elif opcion == "2":
@@ -98,9 +116,12 @@ def menu_principal():
             ver_carrito()
         elif opcion == "4":
             if facturar():
-                break # Esto rompe el ciclo while y finaliza el programa 
+                break # Esto rompe el ciclo while y finaliza el programa (sin pausa, la factura queda visible)
         else:
             print("Opción inválida. Por favor, seleccione una opción del 1 al 4.")
+ 
+        # Pausa antes de volver al menú para que alcance a leer el resultado
+        pausar()
 
 #--------------------------------------------------------------------------------------------------------------------------------------------
 if __name__ == "__main__":
