@@ -60,6 +60,16 @@ def calcular_total():
     for item in carrito:
         total += item['precio']
     return total
+
+#--------------------------------------------------------------------------------------------------------------------------------------------
+# Facturar
+
+def facturar():
+    print("\n========================================")
+    print("              FACTURA FINAL             ")
+    print("========================================")
+    ver_carrito()
+    print("\n¡Gracias por tu compra! Vuelve pronto.")
     
 
 #menu principal
@@ -82,11 +92,7 @@ def menu_principal():
         elif opcion == "3":
             ver_carrito()
         elif opcion == "4":
-            print("\n========================================")
-            print("              FACTURA FINAL             ")
-            print("========================================")
-            ver_carrito()
-            print("\n¡Gracias por tu compra! Vuelve pronto.")
+            facturar()
             break # Esto rompe el ciclo while y finaliza el programa 
         else:
             print("Opción inválida. Por favor, seleccione una opción del 1 al 4.")
