@@ -47,13 +47,21 @@ def ver_carrito():
     if len(carrito) == 0:
         print("\nEl carrito está vacío.")
     else:
-        total = 0
         for item in carrito:
             print(f"- {item['nombre']} (${item['precio']})")
-            total += item['precio']
-        print(f"Total a pagar: ${total}")
+            
+        print(f"Total a pagar: ${calcular_total()}")
 
 #--------------------------------------------------------------------------------------------------------------------------------------------
+# Calcular el carrito total 
+
+def calcular_total():
+    total = 0
+    for item in carrito:
+        total += item['precio']
+    return total
+    
+
 #menu principal
 def menu_principal():
     print("\n--- ¡Bienvenido a nuestra tienda virtual!  ---")
