@@ -1,6 +1,7 @@
 #Proyecto carrito de compras en python
 #Primera entrega del proyecto de Fundamentos de Programación
 #--------------------------------------------------------------------------------------------------------------------------------------------
+
 #Catalogo de productos (definido desde el inicio)
 #Precio en USD
 catalogo = {
@@ -37,7 +38,7 @@ def agregar_al_carrito():
     if numero_producto in catalogo:
         producto = catalogo[numero_producto]
         carrito.append(producto)
-        print(f"{producto['nombre']} ha sido agregado al carrito.")
+        print(f"\n{producto['nombre']} ha sido agregado al carrito.")
     else:
         print("No existe ese producto en el catálogo.")
 
@@ -48,9 +49,9 @@ def ver_carrito():
         print("\nEl carrito está vacío.")
     else:
         for item in carrito:
-            print(f"- {item['nombre']} (${item['precio']})")
+            print(f"\n- {item['nombre']} (${item['precio']})")
             
-        print(f"Total a pagar: ${calcular_total()}")
+        print(f"\nTotal a pagar: ${calcular_total()}")
 
 #--------------------------------------------------------------------------------------------------------------------------------------------
 # Calcular el carrito total 
@@ -65,11 +66,15 @@ def calcular_total():
 # Facturar
 
 def facturar():
+    if calcular_total() == 0:
+        print("\nEl carrito está vacío. No se puede generar una factura.")
+        return False
     print("\n========================================")
     print("              FACTURA FINAL             ")
     print("========================================")
     ver_carrito()
     print("\n¡Gracias por tu compra! Vuelve pronto.")
+    return True
     
 
 #menu principal
@@ -92,8 +97,8 @@ def menu_principal():
         elif opcion == "3":
             ver_carrito()
         elif opcion == "4":
-            facturar()
-            break # Esto rompe el ciclo while y finaliza el programa 
+            if facturar():
+                break # Esto rompe el ciclo while y finaliza el programa 
         else:
             print("Opción inválida. Por favor, seleccione una opción del 1 al 4.")
 
