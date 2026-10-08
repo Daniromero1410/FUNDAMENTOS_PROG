@@ -38,7 +38,7 @@ def mostrar_catalogo():
 #--------------------------------------------------------------------------------------------------------------------------------------------
 # Buscar un producto dentro del carrito por su número de catálogo
 # Devuelve el elemento del carrito, o None si no está
-def buscar_en_carrito(numero_producto):
+def  buscar_en_carrito(numero_producto):
     for item in carrito:
         if item["numero"] == numero_producto:
             return item
@@ -110,14 +110,14 @@ def calcular_total():
 # Imprimir el carrito como tabla alineada (RF-18)
 # Columnas: producto, cantidad, precio unitario y subtotal
 def mostrar_tabla_carrito():
-    print(f"{'Producto':<25}{'Cant.':>6}{'Precio':>10}{'Subtotal':>11}")
-    print("-" * 52)
+    print(f"{'Num.':<6}{'Producto':<25}{'Cant.':>6}{'Precio':>10}{'Subtotal':>11}")
+    print("-" * 58)
     for item in carrito:
         subtotal = item["precio"] * item["cantidad"]
         precio = "$" + str(item["precio"])
         subtotal = "$" + str(subtotal)
-        print(f"{item['nombre']:<25}{item['cantidad']:>6}{precio:>10}{subtotal:>11}")
-    print("-" * 52)
+        print(f"{item['numero']:<6}{item['nombre']:<25}{item['cantidad']:>6}{precio:>10}{subtotal:>11}")
+    print("-" * 58)
 
 #--------------------------------------------------------------------------------------------------------------------------------------------
 # Opcion de ver carrito.
@@ -127,7 +127,7 @@ def ver_carrito():
     else:
         print("\n--- TU CARRITO ---\n")
         mostrar_tabla_carrito()
-        print(f"{'Total a pagar:':<41}{'$' + str(calcular_total()):>11}")
+        print(f"{'Total a pagar:':<47}{'$' + str(calcular_total()):>11}")
 
 #--------------------------------------------------------------------------------------------------------------------------------------------
 # Eliminar un producto del carrito (RF-17): el stock vuelve al inventario
@@ -137,7 +137,7 @@ def eliminar_del_carrito():
         return
 
     ver_carrito()
-    entrada = input("\nIngrese el número del producto que desea eliminar (según el catálogo): ")
+    entrada = input("\nIngrese el número del producto que desea eliminar: ")
 
     if not entrada.isdigit():
         print("\nPor favor, ingrese un número válido.")
@@ -150,10 +150,35 @@ def eliminar_del_carrito():
         print("\nEse producto no está en el carrito.")
         return
 
-    # Se devuelve al inventario lo que se había restado
-    catalogo[numero_producto]["stock"] += item["cantidad"]
-    carrito.remove(item)
-    print(f"\n{item['nombre']} fue eliminado del carrito.")
+    texto = input(f"Tiene {item['cantidad']} de {item['nombre']}. "
+                  f"¿Cuántas desea eliminar? (número o 'todo'): ").strip().lower()
+
+    if texto == "todo":
+        cantidad = item["cantidad"]
+    elif texto.isdigit():
+        cantidad = int(texto)
+    else:
+        print("\nPor favor, ingrese una cantidad válida.")
+        return
+
+    if cantidad <= 0:
+        print("\nLa cantidad debe ser mayor que 0.")
+        return
+
+    if cantidad > item["cantidad"]:
+        print(f"\nSolo tiene {item['cantidad']} unidades de {item['nombre']} en el carrito.")
+        return
+
+    # Se devuelve al inventario lo que se quita del carrito
+    catalogo[numero_producto]["stock"] += cantidad
+    item["cantidad"] -= cantidad
+
+    # Si no queda ninguna unidad, el producto sale del carrito
+    if item["cantidad"] == 0:
+        carrito.remove(item)
+        print(f"\n{item['nombre']} fue eliminado del carrito.")
+    else:
+        print(f"\nSe eliminaron {cantidad} unidades de {item['nombre']}. Quedan {item['cantidad']}.")
 
 #--------------------------------------------------------------------------------------------------------------------------------------------
 # Vaciar el carrito completo (RF-17): todo el stock vuelve al inventario
@@ -178,7 +203,7 @@ def facturar():
     print("              FACTURA FINAL             ")
     print("========================================\n")
     mostrar_tabla_carrito()
-    print(f"{'Total a pagar:':<41}{'$' + str(calcular_total()):>11}")
+    print(f"{'Total a pagar:':<47}{'$' + str(calcular_total()):>11}")
     print("\n¡Gracias por tu compra! Vuelve pronto.")
     return True
 
