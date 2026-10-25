@@ -2,6 +2,6 @@ Entidad,Tipo,Monto_Solicitado,Tasa_Interes_Mensual,Cuotas,Satisfaccion_Cliente,R
 Addi,BNPL,300000,2.18,3,8.5,Ninguno
 Sistecredito,BNPL,350000,2.1,6,8.0,Ninguno
 Nu,Tarjeta_Credito,1000000,2.12,12,9.2,Ninguno
-Bancolombia,Tarjeta_Credito,400000,2.11,24,6.5,Ninguno
-Gota_A_Gota,Informal,500000,20.0,1,1.0,Alto
-Cobrador_Don_Pancho,Informal,250000,,2,2.0,Alto
+Bancolombia,Tarjeta_Credito,450000,2.11,12,6.5,Ninguno
+Gota_A_Gota,Informal,500000,25.0,1,1.0,Alto
+Cobrador_Don_Pancho,Informal,250000,30,2,2.0,Alto
