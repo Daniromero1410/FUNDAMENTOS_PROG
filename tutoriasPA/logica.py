@@ -1,8 +1,7 @@
-"""Lógica del sistema de tutorías (CRUD).
+"""Lógica del sistema de tutorías.
 
-Cada profesor tiene horarios fijos que se repiten cada semana. Los estudiantes
-se apuntan a una fecha concreta de ese horario (sin cupo máximo) y dejan una
-nota con el tema que necesitan ver.
+Los profesores tienen horarios fijos cada semana y los estudiantes se apuntan
+a una fecha concreta. Las acciones devuelven (ok, mensaje).
 """
 import json
 import os
@@ -15,16 +14,16 @@ DIAS = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Doming
 MESES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio",
          "agosto", "septiembre", "octubre", "noviembre", "diciembre"]
 
-DIAS_PARA_CANCELAR = 3   # solo se cancela con 3 días o más de anticipación
-VENTANA_DIAS = 7         # el estudiante ve y se apunta a los próximos 7 días
+DIAS_PARA_CANCELAR = 3
+VENTANA_DIAS = 7
 MAX_NOTA = 200
 MAX_LUGAR = 40
 
 
-# ---------------------------------------------------------------- utilidades
+# ---------------------------------------------------------------- apoyo
 
 def ahora():
-    """Fecha y hora actual (aparte para poder simularla al probar)."""
+    # aparte para poder simular la fecha al probar
     return datetime.now()
 
 
@@ -38,89 +37,138 @@ def guardar_datos(datos):
         json.dump(datos, archivo, ensure_ascii=False, indent=2)
 
 
-def _dt(fecha, hora):
-    """('2026-11-03', '10:00') -> datetime."""
-    return datetime.strptime(f"{fecha} {hora}", "%Y-%m-%d %H:%M")
+def juntar_fecha_y_hora(fecha, hora):
+    """('2026-11-03', '10:00') -> datetime"""
+    return datetime.strptime(fecha + " " + hora, "%Y-%m-%d %H:%M")
 
 
-def describir(dt):
-    """datetime -> 'martes 3 de noviembre, 10:00'."""
-    return f"{DIAS[dt.weekday()].lower()} {dt.day} de {MESES[dt.month - 1]}, {dt:%H:%M}"
+def describir(momento):
+    """datetime -> 'martes 3 de noviembre, 10:00'"""
+    dia = DIAS[momento.weekday()].lower()
+    mes = MESES[momento.month - 1]
+    return f"{dia} {momento.day} de {mes}, {momento:%H:%M}"
 
 
-def _orden_horario(horario):
+def clave_horario(horario):
     return (DIAS.index(horario["dia"]), horario["hora"])
 
 
-def _texto_horarios(horarios):
-    ordenados = sorted(horarios, key=_orden_horario)
-    return ", ".join(f"{h['dia']} {h['hora']}" for h in ordenados)
+def clave_fecha(elemento):
+    return elemento["dt"]
 
 
-def _buscar_horario(info, horario_id):
-    for horario in info["horarios"]:
+def clave_profesor(profesor):
+    return (profesor["materia"], profesor["nombre"])
+
+
+def sin_tildes(texto):
+    return unicodedata.normalize("NFD", texto)
+
+
+def buscar_horario(profesor_info, horario_id):
+    for horario in profesor_info["horarios"]:
         if horario["id"] == horario_id:
             return horario
     return None
 
 
-def _siguiente_id(inscripciones):
-    return max((i["id"] for i in inscripciones), default=0) + 1
-
-
-def _siguiente_id_horario(datos):
-    numeros = [int(h["id"][1:]) for info in datos["profesores"].values() for h in info["horarios"]]
-    return "h" + str(max(numeros, default=0) + 1)
-
-
-def _inscripcion_de(datos, inscripcion_id, estudiante):
-    for i in datos["inscripciones"]:
-        if i["id"] == inscripcion_id and i["estudiante"] == estudiante:
-            return i
+def buscar_inscripcion(datos, inscripcion_id, estudiante):
+    for inscripcion in datos["inscripciones"]:
+        if inscripcion["id"] == inscripcion_id and inscripcion["estudiante"] == estudiante:
+            return inscripcion
     return None
 
 
-def _futuras(datos, profesor, horario_id):
-    """Inscripciones que todavía no han ocurrido para un horario fijo."""
-    return [i for i in datos["inscripciones"]
-            if i["profesor"] == profesor and i["horario"] == horario_id
-            and _dt(i["fecha"], i["hora"]) > ahora()]
+def inscripciones_futuras(datos, profesor, horario_id):
+    futuras = []
+    for inscripcion in datos["inscripciones"]:
+        if inscripcion["profesor"] != profesor or inscripcion["horario"] != horario_id:
+            continue
+        momento = juntar_fecha_y_hora(inscripcion["fecha"], inscripcion["hora"])
+        if momento > ahora():
+            futuras.append(inscripcion)
+    return futuras
 
 
-def _sesiones(datos, profesor, estudiante=None, dias=VENTANA_DIAS):
-    """Fechas concretas de los horarios fijos de un profesor en los próximos días."""
-    info = datos["profesores"].get(profesor)
-    if info is None:
+def sesiones_de_profesor(datos, profesor, estudiante=None):
+    """Fechas concretas de los horarios del profesor en los próximos 7 días."""
+    profesor_info = datos["profesores"].get(profesor)
+    if profesor_info is None:
         return []
+
     hoy = ahora().date()
     sesiones = []
-    for horario in info["horarios"]:
-        for d in range(dias):
-            fecha = hoy + timedelta(days=d)
+
+    for horario in profesor_info["horarios"]:
+        for dias_desde_hoy in range(VENTANA_DIAS):
+            fecha = hoy + timedelta(days=dias_desde_hoy)
             if DIAS[fecha.weekday()] != horario["dia"]:
                 continue
-            clave = fecha.isoformat()
-            dt = _dt(clave, horario["hora"])
-            if dt <= ahora():
+
+            fecha_texto = fecha.isoformat()
+            momento = juntar_fecha_y_hora(fecha_texto, horario["hora"])
+            if momento <= ahora():
                 continue
-            inscritos = [i for i in datos["inscripciones"]
-                         if i["profesor"] == profesor and i["horario"] == horario["id"]
-                         and i["fecha"] == clave]
-            mia = next((i["id"] for i in inscritos if i["estudiante"] == estudiante), None)
+
+            cantidad = 0
+            mi_inscripcion = None
+            for inscripcion in datos["inscripciones"]:
+                es_esta_sesion = (inscripcion["profesor"] == profesor
+                                  and inscripcion["horario"] == horario["id"]
+                                  and inscripcion["fecha"] == fecha_texto)
+                if es_esta_sesion:
+                    cantidad = cantidad + 1
+                    if inscripcion["estudiante"] == estudiante:
+                        mi_inscripcion = inscripcion["id"]
+
             sesiones.append({
                 "horario": horario["id"],
-                "fecha": clave,
-                "dt": dt,
+                "fecha": fecha_texto,
+                "dt": momento,
                 "hora": horario["hora"],
                 "lugar": horario["lugar"],
-                "inscritos": len(inscritos),
-                "mia": mia,
+                "inscritos": cantidad,
+                "mia": mi_inscripcion,
             })
-    sesiones.sort(key=lambda s: s["dt"])
+
+    sesiones.sort(key=clave_fecha)
     return sesiones
 
 
-# ------------------------------------------------- READ (estudiante / público)
+def revisar_nota(nota):
+    """Devuelve (nota, error). Si no hay error, error es ''."""
+    if nota is None:
+        nota = ""
+    nota = nota.strip()
+    if len(nota) > MAX_NOTA:
+        return nota, f"La nota no puede pasar de {MAX_NOTA} caracteres."
+    return nota, ""
+
+
+def revisar_horario(dia, hora, lugar):
+    """Devuelve (error, hora, lugar). Si no hay error, error es ''."""
+    if dia not in DIAS:
+        return "Elige un día válido.", hora, lugar
+
+    if hora is None:
+        hora = ""
+    try:
+        hora = datetime.strptime(hora.strip(), "%H:%M").strftime("%H:%M")
+    except ValueError:
+        return "La hora debe tener formato HH:MM, por ejemplo 10:00.", hora, lugar
+
+    if lugar is None:
+        lugar = ""
+    lugar = lugar.strip()
+    if lugar == "":
+        return "Escribe el lugar de la tutoría.", hora, lugar
+    if len(lugar) > MAX_LUGAR:
+        return f"El lugar no puede pasar de {MAX_LUGAR} caracteres.", hora, lugar
+
+    return "", hora, lugar
+
+
+# ------------------------------------------------------------- consultas
 
 def estudiantes():
     return cargar_datos()["estudiantes"]
@@ -128,264 +176,352 @@ def estudiantes():
 
 def materias():
     datos = cargar_datos()
-    unicas = {p["materia"] for p in datos["profesores"].values()}
-    return sorted(unicas, key=lambda m: unicodedata.normalize("NFD", m))
+    lista = []
+    for profesor_info in datos["profesores"].values():
+        if profesor_info["materia"] not in lista:
+            lista.append(profesor_info["materia"])
+    lista.sort(key=sin_tildes)
+    return lista
+
+
+def resumen_profesor(profesor_id, profesor_info):
+    textos = []
+    for horario in sorted(profesor_info["horarios"], key=clave_horario):
+        textos.append(horario["dia"] + " " + horario["hora"])
+    horarios_texto = ", ".join(textos)
+    if horarios_texto == "":
+        horarios_texto = "Sin horarios"
+
+    return {
+        "id": profesor_id,
+        "nombre": profesor_info["nombre"],
+        "materia": profesor_info["materia"],
+        "horarios_texto": horarios_texto,
+    }
 
 
 def obtener_profesor(profesor):
-    """{'id', 'nombre', 'materia', 'horarios_texto'} o None si no existe."""
-    info = cargar_datos()["profesores"].get(profesor)
-    if info is None:
+    profesor_info = cargar_datos()["profesores"].get(profesor)
+    if profesor_info is None:
         return None
-    return {"id": profesor, "nombre": info["nombre"], "materia": info["materia"],
-            "horarios_texto": _texto_horarios(info["horarios"]) or "Sin horarios"}
+    return resumen_profesor(profesor, profesor_info)
 
 
 def listar_profesores(materia=None):
     datos = cargar_datos()
     resultado = []
-    for pid, info in datos["profesores"].items():
-        if materia and info["materia"] != materia:
+    for profesor_id, profesor_info in datos["profesores"].items():
+        if materia and profesor_info["materia"] != materia:
             continue
-        resultado.append({"id": pid, "nombre": info["nombre"], "materia": info["materia"],
-                          "horarios_texto": _texto_horarios(info["horarios"]) or "Sin horarios"})
-    resultado.sort(key=lambda p: (p["materia"], p["nombre"]))
+        resultado.append(resumen_profesor(profesor_id, profesor_info))
+    resultado.sort(key=clave_profesor)
     return resultado
 
 
 def proximas_tutorias(profesor, estudiante=None):
-    """Tutorías de un profesor en los próximos 7 días, con cuántos se han apuntado."""
-    return _sesiones(cargar_datos(), profesor, estudiante)
+    return sesiones_de_profesor(cargar_datos(), profesor, estudiante)
 
 
 def proximas_global(limite=5):
-    """Las próximas tutorías de todos los profesores, ordenadas por fecha."""
     datos = cargar_datos()
     todas = []
-    for pid, info in datos["profesores"].items():
-        for sesion in _sesiones(datos, pid):
-            todas.append({**sesion, "profesor_id": pid,
-                          "profesor": info["nombre"], "materia": info["materia"]})
-    todas.sort(key=lambda s: s["dt"])
+    for profesor_id, profesor_info in datos["profesores"].items():
+        for sesion in sesiones_de_profesor(datos, profesor_id):
+            sesion["profesor_id"] = profesor_id
+            sesion["profesor"] = profesor_info["nombre"]
+            sesion["materia"] = profesor_info["materia"]
+            todas.append(sesion)
+    todas.sort(key=clave_fecha)
     return todas[:limite]
 
 
 def mis_tutorias(estudiante):
-    """Próximas tutorías a las que se apuntó el estudiante, ordenadas por fecha."""
     datos = cargar_datos()
     tutorias = []
-    for i in datos["inscripciones"]:
-        if i["estudiante"] != estudiante:
+
+    for inscripcion in datos["inscripciones"]:
+        if inscripcion["estudiante"] != estudiante:
             continue
-        dt = _dt(i["fecha"], i["hora"])
-        if dt <= ahora():
+
+        momento = juntar_fecha_y_hora(inscripcion["fecha"], inscripcion["hora"])
+        if momento <= ahora():
             continue
-        info = datos["profesores"].get(i["profesor"])
-        horario = _buscar_horario(info, i["horario"]) if info else None
+
+        profesor_info = datos["profesores"].get(inscripcion["profesor"])
+        if profesor_info is None:
+            nombre = "Profesor"
+            materia = ""
+            lugar = ""
+        else:
+            nombre = profesor_info["nombre"]
+            materia = profesor_info["materia"]
+            horario = buscar_horario(profesor_info, inscripcion["horario"])
+            if horario is None:
+                lugar = ""
+            else:
+                lugar = horario["lugar"]
+
+        falta = momento - ahora()
+        cancelable = falta >= timedelta(days=DIAS_PARA_CANCELAR)
+
         tutorias.append({
-            "id": i["id"],
-            "profesor_id": i["profesor"],
-            "profesor": info["nombre"] if info else "Profesor",
-            "materia": info["materia"] if info else "",
-            "fecha": i["fecha"],
-            "dt": dt,
-            "hora": i["hora"],
-            "lugar": horario["lugar"] if horario else "",
-            "nota": i["nota"],
-            "cancelable": dt - ahora() >= timedelta(days=DIAS_PARA_CANCELAR),
+            "id": inscripcion["id"],
+            "profesor_id": inscripcion["profesor"],
+            "profesor": nombre,
+            "materia": materia,
+            "fecha": inscripcion["fecha"],
+            "dt": momento,
+            "hora": inscripcion["hora"],
+            "lugar": lugar,
+            "nota": inscripcion["nota"],
+            "cancelable": cancelable,
         })
-    tutorias.sort(key=lambda t: t["dt"])
+
+    tutorias.sort(key=clave_fecha)
     return tutorias
 
 
-# --------------------------------------------- CREATE / UPDATE / DELETE (estudiante)
+# ------------------------------------------------- acciones del estudiante
 
 def apuntarse(estudiante, profesor, horario, fecha, nota=""):
-    """CREATE: apunta al estudiante a la tutoría de un profesor en una fecha."""
     datos = cargar_datos()
+
     if estudiante not in datos["estudiantes"]:
         return False, "Estudiante no registrado."
-    info = datos["profesores"].get(profesor)
-    if info is None:
+
+    profesor_info = datos["profesores"].get(profesor)
+    if profesor_info is None:
         return False, "Profesor no encontrado."
-    h = _buscar_horario(info, horario)
-    if h is None:
+
+    horario_info = buscar_horario(profesor_info, horario)
+    if horario_info is None:
         return False, "Ese horario no existe."
+
     try:
-        dt = _dt(fecha, h["hora"])
+        momento = juntar_fecha_y_hora(fecha, horario_info["hora"])
     except ValueError:
         return False, "La fecha no es válida."
-    if DIAS[dt.weekday()] != h["dia"]:
-        return False, f"Esa tutoría es el {h['dia'].lower()}."
-    if dt <= ahora():
-        return False, "Esa tutoría ya pasó."
-    if dt.date() > ahora().date() + timedelta(days=VENTANA_DIAS - 1):
-        return False, f"Solo puedes apuntarte a las tutorías de los próximos {VENTANA_DIAS} días."
-    nota = (nota or "").strip()
-    if len(nota) > MAX_NOTA:
-        return False, f"La nota no puede pasar de {MAX_NOTA} caracteres."
 
-    for i in datos["inscripciones"]:
-        if i["estudiante"] != estudiante or i["fecha"] != fecha:
+    if DIAS[momento.weekday()] != horario_info["dia"]:
+        return False, f"Esa tutoría es el {horario_info['dia'].lower()}."
+
+    if momento <= ahora():
+        return False, "Esa tutoría ya pasó."
+
+    ultimo_dia = ahora().date() + timedelta(days=VENTANA_DIAS - 1)
+    if momento.date() > ultimo_dia:
+        return False, f"Solo puedes apuntarte a las tutorías de los próximos {VENTANA_DIAS} días."
+
+    nota, error = revisar_nota(nota)
+    if error:
+        return False, error
+
+    for inscripcion in datos["inscripciones"]:
+        if inscripcion["estudiante"] != estudiante or inscripcion["fecha"] != fecha:
             continue
-        if i["profesor"] == profesor and i["horario"] == horario:
+
+        if inscripcion["profesor"] == profesor and inscripcion["horario"] == horario:
             return False, "Ya te apuntaste a esa tutoría."
-        if i["hora"] == h["hora"]:
-            otro = datos["profesores"][i["profesor"]]["nombre"]
-            return False, f"Ya tienes otra tutoría a esa hora con {otro}."
+
+        if inscripcion["hora"] == horario_info["hora"]:
+            otro_profesor = datos["profesores"][inscripcion["profesor"]]["nombre"]
+            return False, f"Ya tienes otra tutoría a esa hora con {otro_profesor}."
+
+    mayor_id = 0
+    for inscripcion in datos["inscripciones"]:
+        if inscripcion["id"] > mayor_id:
+            mayor_id = inscripcion["id"]
 
     datos["inscripciones"].append({
-        "id": _siguiente_id(datos["inscripciones"]),
+        "id": mayor_id + 1,
         "estudiante": estudiante,
         "profesor": profesor,
         "horario": horario,
         "fecha": fecha,
-        "hora": h["hora"],
+        "hora": horario_info["hora"],
         "nota": nota,
     })
     guardar_datos(datos)
-    return True, f"Quedó registrada tu asistencia a la tutoría de {info['nombre']}, {describir(dt)}."
+    return True, f"Quedó registrada tu asistencia a la tutoría de {profesor_info['nombre']}, {describir(momento)}."
 
 
 def editar_nota(estudiante, inscripcion, nota):
-    """UPDATE: cambia la nota de una tutoría propia que aún no ha pasado."""
     datos = cargar_datos()
-    i = _inscripcion_de(datos, inscripcion, estudiante)
-    if i is None:
+
+    inscripcion_info = buscar_inscripcion(datos, inscripcion, estudiante)
+    if inscripcion_info is None:
         return False, "No encontré esa tutoría entre las tuyas."
-    if _dt(i["fecha"], i["hora"]) <= ahora():
+
+    momento = juntar_fecha_y_hora(inscripcion_info["fecha"], inscripcion_info["hora"])
+    if momento <= ahora():
         return False, "Esa tutoría ya pasó."
-    nota = (nota or "").strip()
-    if len(nota) > MAX_NOTA:
-        return False, f"La nota no puede pasar de {MAX_NOTA} caracteres."
-    i["nota"] = nota
+
+    nota, error = revisar_nota(nota)
+    if error:
+        return False, error
+
+    inscripcion_info["nota"] = nota
     guardar_datos(datos)
     return True, "Nota actualizada."
 
 
 def cancelar(estudiante, inscripcion):
-    """DELETE: cancela una tutoría propia, solo con 3 días o más de anticipación."""
     datos = cargar_datos()
-    i = _inscripcion_de(datos, inscripcion, estudiante)
-    if i is None:
+
+    inscripcion_info = buscar_inscripcion(datos, inscripcion, estudiante)
+    if inscripcion_info is None:
         return False, "No encontré esa tutoría entre las tuyas."
-    dt = _dt(i["fecha"], i["hora"])
-    if dt <= ahora():
+
+    momento = juntar_fecha_y_hora(inscripcion_info["fecha"], inscripcion_info["hora"])
+    if momento <= ahora():
         return False, "Esa tutoría ya pasó."
-    if dt - ahora() < timedelta(days=DIAS_PARA_CANCELAR):
+
+    falta = momento - ahora()
+    if falta < timedelta(days=DIAS_PARA_CANCELAR):
         return False, (f"Solo se puede cancelar con {DIAS_PARA_CANCELAR} días de "
                        "anticipación. Escríbele al profesor.")
-    datos["inscripciones"].remove(i)
+
+    datos["inscripciones"].remove(inscripcion_info)
     guardar_datos(datos)
     return True, "Tutoría cancelada."
 
 
-# ------------------------------------------------------------- panel profesor
+# ------------------------------------------------------- panel profesor
 
 def horarios_de(profesor):
-    """READ: horarios fijos del profesor, con cuántos se han apuntado a próximas fechas."""
     datos = cargar_datos()
-    info = datos["profesores"].get(profesor)
-    if info is None:
+    profesor_info = datos["profesores"].get(profesor)
+    if profesor_info is None:
         return []
-    horarios = []
-    for h in sorted(info["horarios"], key=_orden_horario):
-        horarios.append({**h, "proximos": len(_futuras(datos, profesor, h["id"]))})
-    return horarios
+
+    resultado = []
+    for horario in sorted(profesor_info["horarios"], key=clave_horario):
+        futuras = inscripciones_futuras(datos, profesor, horario["id"])
+        resultado.append({
+            "id": horario["id"],
+            "dia": horario["dia"],
+            "hora": horario["hora"],
+            "lugar": horario["lugar"],
+            "proximos": len(futuras),
+        })
+    return resultado
 
 
 def ver_inscritos(profesor):
-    """READ: quién se apuntó a las próximas tutorías, agrupado por fecha y hora."""
     datos = cargar_datos()
-    info = datos["profesores"].get(profesor)
-    if info is None:
+    profesor_info = datos["profesores"].get(profesor)
+    if profesor_info is None:
         return []
-    grupos = {}
-    for i in datos["inscripciones"]:
-        if i["profesor"] != profesor:
+
+    grupos = {}   # clave: (fecha, id del horario)
+
+    for inscripcion in datos["inscripciones"]:
+        if inscripcion["profesor"] != profesor:
             continue
-        dt = _dt(i["fecha"], i["hora"])
-        if dt <= ahora():
+
+        momento = juntar_fecha_y_hora(inscripcion["fecha"], inscripcion["hora"])
+        if momento <= ahora():
             continue
-        horario = _buscar_horario(info, i["horario"])
-        grupo = grupos.setdefault((i["fecha"], i["horario"]), {
-            "dt": dt,
-            "hora": i["hora"],
-            "lugar": horario["lugar"] if horario else "",
-            "estudiantes": [],
+
+        clave = (inscripcion["fecha"], inscripcion["horario"])
+        if clave not in grupos:
+            horario = buscar_horario(profesor_info, inscripcion["horario"])
+            if horario is None:
+                lugar = ""
+            else:
+                lugar = horario["lugar"]
+            grupos[clave] = {
+                "dt": momento,
+                "hora": inscripcion["hora"],
+                "lugar": lugar,
+                "estudiantes": [],
+            }
+
+        grupos[clave]["estudiantes"].append({
+            "nombre": inscripcion["estudiante"],
+            "nota": inscripcion["nota"],
         })
-        grupo["estudiantes"].append({"nombre": i["estudiante"], "nota": i["nota"]})
-    return sorted(grupos.values(), key=lambda g: g["dt"])
 
-
-def _validar_horario(dia, hora, lugar):
-    """Devuelve ((dia, hora, lugar), '') si todo está bien, o (None, mensaje)."""
-    if dia not in DIAS:
-        return None, "Elige un día válido."
-    try:
-        hora = datetime.strptime((hora or "").strip(), "%H:%M").strftime("%H:%M")
-    except ValueError:
-        return None, "La hora debe tener formato HH:MM, por ejemplo 10:00."
-    lugar = (lugar or "").strip()
-    if not lugar:
-        return None, "Escribe el lugar de la tutoría."
-    if len(lugar) > MAX_LUGAR:
-        return None, f"El lugar no puede pasar de {MAX_LUGAR} caracteres."
-    return (dia, hora, lugar), ""
+    resultado = list(grupos.values())
+    resultado.sort(key=clave_fecha)
+    return resultado
 
 
 def crear_horario(profesor, dia, hora, lugar):
-    """CREATE: agrega un horario fijo semanal al profesor."""
     datos = cargar_datos()
-    info = datos["profesores"].get(profesor)
-    if info is None:
+    profesor_info = datos["profesores"].get(profesor)
+    if profesor_info is None:
         return False, "Profesor no encontrado."
-    valores, error = _validar_horario(dia, hora, lugar)
-    if valores is None:
+
+    error, hora, lugar = revisar_horario(dia, hora, lugar)
+    if error:
         return False, error
-    dia, hora, lugar = valores
-    if any(h["dia"] == dia and h["hora"] == hora for h in info["horarios"]):
-        return False, "Ya tienes un horario ese día a esa hora."
-    info["horarios"].append({"id": _siguiente_id_horario(datos), "dia": dia,
-                             "hora": hora, "lugar": lugar})
+
+    for horario in profesor_info["horarios"]:
+        if horario["dia"] == dia and horario["hora"] == hora:
+            return False, "Ya tienes un horario ese día a esa hora."
+
+    # los ids son "h1", "h2"...: busco el número mayor y le sumo 1
+    mayor_numero = 0
+    for otro_profesor in datos["profesores"].values():
+        for horario in otro_profesor["horarios"]:
+            numero = int(horario["id"][1:])
+            if numero > mayor_numero:
+                mayor_numero = numero
+
+    profesor_info["horarios"].append({
+        "id": "h" + str(mayor_numero + 1),
+        "dia": dia,
+        "hora": hora,
+        "lugar": lugar,
+    })
     guardar_datos(datos)
     return True, f"Horario agregado: {dia} {hora}."
 
 
 def editar_horario(profesor, horario, dia, hora, lugar):
-    """UPDATE: cambia día, hora o lugar. Si ya hay estudiantes apuntados, solo el lugar."""
     datos = cargar_datos()
-    info = datos["profesores"].get(profesor)
-    if info is None:
+    profesor_info = datos["profesores"].get(profesor)
+    if profesor_info is None:
         return False, "Profesor no encontrado."
-    h = _buscar_horario(info, horario)
-    if h is None:
+
+    horario_info = buscar_horario(profesor_info, horario)
+    if horario_info is None:
         return False, "Ese horario no existe."
-    valores, error = _validar_horario(dia, hora, lugar)
-    if valores is None:
+
+    error, hora, lugar = revisar_horario(dia, hora, lugar)
+    if error:
         return False, error
-    dia, hora, lugar = valores
-    if any(o["id"] != horario and o["dia"] == dia and o["hora"] == hora for o in info["horarios"]):
-        return False, "Ya tienes otro horario ese día a esa hora."
-    cambia_fecha = (dia, hora) != (h["dia"], h["hora"])
-    if cambia_fecha and _futuras(datos, profesor, horario):
-        return False, "Hay estudiantes apuntados. Por ahora solo puedes cambiar el lugar."
-    h["dia"], h["hora"], h["lugar"] = dia, hora, lugar
+
+    for otro in profesor_info["horarios"]:
+        if otro["id"] != horario and otro["dia"] == dia and otro["hora"] == hora:
+            return False, "Ya tienes otro horario ese día a esa hora."
+
+    cambia_dia_u_hora = dia != horario_info["dia"] or hora != horario_info["hora"]
+    if cambia_dia_u_hora:
+        if len(inscripciones_futuras(datos, profesor, horario)) > 0:
+            return False, "Hay estudiantes apuntados. Por ahora solo puedes cambiar el lugar."
+
+    horario_info["dia"] = dia
+    horario_info["hora"] = hora
+    horario_info["lugar"] = lugar
     guardar_datos(datos)
     return True, "Horario actualizado."
 
 
 def eliminar_horario(profesor, horario):
-    """DELETE: elimina un horario fijo si nadie está apuntado a próximas fechas."""
     datos = cargar_datos()
-    info = datos["profesores"].get(profesor)
-    if info is None:
+    profesor_info = datos["profesores"].get(profesor)
+    if profesor_info is None:
         return False, "Profesor no encontrado."
-    h = _buscar_horario(info, horario)
-    if h is None:
+
+    horario_info = buscar_horario(profesor_info, horario)
+    if horario_info is None:
         return False, "Ese horario no existe."
-    if _futuras(datos, profesor, horario):
+
+    if len(inscripciones_futuras(datos, profesor, horario)) > 0:
         return False, "No puedes eliminarlo: hay estudiantes apuntados a próximas tutorías."
-    info["horarios"].remove(h)
+
+    profesor_info["horarios"].remove(horario_info)
     guardar_datos(datos)
     return True, "Horario eliminado."
