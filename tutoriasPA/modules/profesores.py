@@ -10,17 +10,27 @@ def horarios_de_profesor(profesor_id):
     return horarios_del_profesor
 
 
-# Inscripciones futuras a las tutorías de este profesor
+# Inscripciones futuras a las tutorías de este profesor, con el nombre del estudiante y el día y la hora
 def ver_inscritos(profesor_id):
     inscripciones = utils.cargar_datos("inscripciones")
     horarios = utils.cargar_datos("horarios")
+    estudiantes = utils.cargar_datos("estudiantes")
     inscritos = []
     for inscripcion in inscripciones:
         horario = utils.buscar_por_id(horarios, inscripcion["horario_id"])
         if horario["profesor_id"] == profesor_id:
             fecha_hora_tutoria = utils.fecha_hora_de_inscripcion(inscripcion, horarios)
             if fecha_hora_tutoria >= utils.fecha_hora_actual():   # solo inscripciones futuras
-                inscritos.append(inscripcion)
+                estudiante = utils.buscar_por_id(estudiantes, inscripcion["estudiante_id"])
+                inscritos.append({
+                    "id": inscripcion["id"],
+                    "horario_id": inscripcion["horario_id"],
+                    "fecha": inscripcion["fecha"],
+                    "nota": inscripcion["nota"],
+                    "dia": horario["dia"],
+                    "hora": horario["hora"],
+                    "estudiante_nombre": estudiante["nombre"]
+                })
     return inscritos
 
 

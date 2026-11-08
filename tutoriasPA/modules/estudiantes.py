@@ -24,13 +24,25 @@ def revisar_nota(nota):
 def mis_tutorias(estudiante_id):
     inscripciones = utils.cargar_datos("inscripciones")
     horarios = utils.cargar_datos("horarios")
-    inscripciones_futuras = []
+    profesores = utils.cargar_datos("profesores")
+    tutorias = []
     for inscripcion in inscripciones:
         if inscripcion["estudiante_id"] == estudiante_id:
             fecha_hora_tutoria = utils.fecha_hora_de_inscripcion(inscripcion, horarios)
             if fecha_hora_tutoria >= utils.fecha_hora_actual():   # solo las que aún no han pasado
-                inscripciones_futuras.append(inscripcion)
-    return inscripciones_futuras
+                horario = utils.buscar_por_id(horarios, inscripcion["horario_id"])
+                profesor = utils.buscar_por_id(profesores, horario["profesor_id"])
+                tutorias.append({
+                    "id": inscripcion["id"],
+                    "fecha": inscripcion["fecha"],
+                    "nota": inscripcion["nota"],
+                    "dia": horario["dia"],
+                    "hora": horario["hora"],
+                    "lugar": horario["lugar"],
+                    "profesor_nombre": profesor["nombre"],
+                    "materia": profesor["materia"]
+                })
+    return tutorias
 
 
 def cancelar(inscripcion_id, estudiante_id):

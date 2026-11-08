@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block contenido %}
+  <a class="volver" href="/profesores">Volver a profesores</a>
+
+  <div class="encabezado">
+    <h1>{{ profesor.nombre }}</h1>
+    <p class="suave">{{ profesor.materia }}</p>
+  </div>
+
+  {% if tutorias|length == 0 %}
+    <p class="vacio">Este profesor no tiene tutorías en los próximos 7 días.</p>
+  {% endif %}
+
+  <ul class="lista">
+    {% for tutoria in tutorias %}
+      <li class="tutoria">
+        <div class="fecha">
+          <span class="fecha-dia">{{ tutoria.dia[:3] }}</span>
+          <span class="fecha-numero">{{ tutoria.fecha[8:] }}</span>
+        </div>
+
+        <div>
+          <p class="tutoria-hora">{{ tutoria.hora }}</p>
+          <p class="tutoria-detalle">{{ tutoria.lugar }}</p>
+        </div>
+
+        {% if rol == "estudiante" %}
+          <form class="tutoria-apuntar" method="post" action="/apuntarse">
+            <input type="hidden" name="profesor_id" value="{{ profesor.id }}">
+            <input type="hidden" name="horario_id" value="{{ tutoria.horario_id }}">
+            <input type="hidden" name="fecha" value="{{ tutoria.fecha }}">
+            <input type="text" name="nota" placeholder="¿Qué quieres repasar?" aria-label="Nota">
+            <button class="boton" type="submit">Apuntarme</button>
+          </form>
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+{% endblock %}

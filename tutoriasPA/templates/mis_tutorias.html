@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block contenido %}
+  <div class="encabezado">
+    <h1>Mis tutorías</h1>
+    <p class="suave">Puedes cancelar hasta 3 días antes.</p>
+  </div>
+
+  {% if tutorias|length == 0 %}
+    <p class="vacio">No tienes tutorías próximas. <a href="/profesores">Buscar un profesor</a></p>
+  {% endif %}
+
+  <ul class="lista">
+    {% for tutoria in tutorias %}
+      <li class="tutoria">
+        <div class="fecha">
+          <span class="fecha-dia">{{ tutoria.dia[:3] }}</span>
+          <span class="fecha-numero">{{ tutoria.fecha[8:] }}</span>
+        </div>
+
+        <div>
+          <p class="tutoria-profesor">{{ tutoria.profesor_nombre }}</p>
+          <p class="tutoria-detalle">{{ tutoria.materia }}</p>
+          <p class="tutoria-detalle">{{ tutoria.hora }} en {{ tutoria.lugar }}</p>
+        </div>
+
+        <div class="tutoria-acciones">
+          <form class="form-nota" method="post" action="/tutoria/{{ tutoria.id }}/nota">
+            <input type="text" name="nota" value="{{ tutoria.nota }}" aria-label="Nota">
+            <button class="boton boton-claro" type="submit">Guardar nota</button>
+          </form>
+
+          <form method="post" action="/tutoria/{{ tutoria.id }}/cancelar">
+            <button class="boton boton-peligro" type="submit">Cancelar tutoría</button>
+          </form>
+        </div>
+      </li>
+    {% endfor %}
+  </ul>
+{% endblock %}

@@ -1,0 +1,242 @@
+/* ===== Colores y fuentes (cámbialos aquí y cambia todo el sitio) ===== */
+:root {
+  --papel: #F4F6FA;
+  --blanco: #FFFFFF;
+  --tinta: #17233B;
+  --tinta-suave: #56657F;
+  --linea: #D8DFEA;
+  --marcador: #FFDE59;       /* el amarillo de resaltador: solo para las fechas */
+  --ok: #1D6642;
+  --ok-fondo: #E3F2E9;
+  --error: #A3231C;
+  --error-fondo: #FBE9E7;
+  --fuente-titulos: "Bricolage Grotesque", system-ui, sans-serif;
+  --fuente-texto: "Public Sans", system-ui, sans-serif;
+}
+
+/* ===== Base ===== */
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--papel);
+  color: var(--tinta);
+  font-family: var(--fuente-texto);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+h1, h2 {
+  font-family: var(--fuente-titulos);
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+h1 { font-size: 2.1rem; margin: 0 0 6px; }
+
+a { color: var(--tinta); }
+
+.suave { color: var(--tinta-suave); margin: 0; }
+
+/* ===== Barra de arriba ===== */
+.barra {
+  background: var(--tinta);
+  color: var(--blanco);
+}
+
+.barra-contenido {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 14px 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  align-items: center;
+}
+
+.marca {
+  font-family: var(--fuente-titulos);
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: var(--blanco);
+  text-decoration: none;
+  margin-right: auto;
+}
+
+.barra a { color: var(--blanco); }
+.barra-enlace { text-decoration: none; padding: 4px 0; border-bottom: 2px solid transparent; }
+.barra-enlace:hover { border-bottom-color: var(--marcador); }
+.barra-usuario { color: #C3CCDD; font-size: 0.95rem; }
+
+/* ===== Contenido ===== */
+.pagina {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 32px 20px 64px;
+}
+
+.volver {
+  display: inline-block;
+  margin-bottom: 18px;
+  color: var(--tinta-suave);
+}
+
+.encabezado { margin-bottom: 24px; }
+
+/* ===== Avisos (flash) ===== */
+.aviso {
+  margin: 0 0 20px;
+  padding: 12px 16px;
+  border-left: 5px solid;
+  font-weight: 600;
+}
+.aviso.ok { background: var(--ok-fondo); color: var(--ok); border-color: var(--ok); }
+.aviso.error { background: var(--error-fondo); color: var(--error); border-color: var(--error); }
+
+/* ===== Formularios ===== */
+input[type="text"], select {
+  font: inherit;
+  color: var(--tinta);
+  background: var(--blanco);
+  border: 1px solid #A9B5C9;
+  border-radius: 6px;
+  padding: 9px 12px;
+  min-width: 0;
+}
+
+input[type="text"]:focus-visible, select:focus-visible, button:focus-visible, a:focus-visible {
+  outline: 3px solid #3F6FD8;
+  outline-offset: 2px;
+}
+
+.boton {
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid var(--tinta);
+  border-radius: 6px;
+  padding: 9px 16px;
+  background: var(--tinta);
+  color: var(--blanco);
+}
+.boton:hover { background: #26375A; }
+
+.boton-claro { background: var(--blanco); color: var(--tinta); }
+.boton-claro:hover { background: var(--papel); }
+
+.boton-peligro { background: var(--blanco); color: var(--error); border-color: var(--error); }
+.boton-peligro:hover { background: var(--error-fondo); }
+
+/* ===== Entrada ===== */
+.entrada {
+  max-width: 420px;
+  margin: 6vh auto 0;
+  padding: 28px;
+  background: var(--blanco);
+  border: 1px solid var(--linea);
+  border-radius: 8px;
+}
+.entrada form { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.entrada select { flex: 1 1 140px; }
+
+/* ===== Lista de profesores ===== */
+.lista { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--linea); }
+.lista > li { border-bottom: 1px solid var(--linea); }
+
+.fila {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  padding: 18px 6px;
+  color: inherit;
+  text-decoration: none;
+}
+.fila:hover { background: var(--blanco); }
+.fila:hover .fila-nombre { text-decoration: underline; text-decoration-thickness: 2px; }
+.fila-nombre { font-family: var(--fuente-titulos); font-size: 1.25rem; font-weight: 600; }
+.fila-materia { color: var(--tinta-suave); text-align: right; }
+
+/* ===== Tutorías (profesor y mis tutorías) ===== */
+.tutoria {
+  display: grid;
+  grid-template-columns: 76px 1fr auto;
+  gap: 8px 20px;
+  align-items: center;
+  padding: 20px 6px;
+}
+
+.tutoria > * { min-width: 0; }   /* evita que una fila se salga de la pantalla */
+
+.fecha {
+  background: var(--marcador);
+  color: var(--tinta);
+  border-radius: 6px;
+  text-align: center;
+  padding: 8px 0 6px;
+  line-height: 1.1;
+}
+.fecha-dia { display: block; font-size: 0.9rem; font-weight: 600; }
+.fecha-numero { display: block; font-family: var(--fuente-titulos); font-size: 2rem; font-weight: 800; }
+
+.tutoria-hora { margin: 0; font-family: var(--fuente-titulos); font-size: 1.25rem; font-weight: 700; }
+.tutoria-detalle { margin: 0; color: var(--tinta-suave); }
+.tutoria-profesor { margin: 0 0 2px; font-weight: 600; }
+
+.tutoria-apuntar { display: flex; gap: 8px; }
+.tutoria-apuntar input[type="text"] { width: 220px; }
+
+/* en "Mis tutorías" las acciones van en una fila debajo */
+.tutoria-acciones {
+  grid-column: 2 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.tutoria-acciones .form-nota { display: flex; gap: 8px; flex: 1 1 260px; min-width: 0; }
+.tutoria-acciones .form-nota input[type="text"] { flex: 1; width: 0; }   /* width 0 + flex 1: ocupa lo que sobra sin empujar el botón */
+
+.vacio { padding: 24px 0; color: var(--tinta-suave); }
+
+/* ===== Panel del profesor ===== */
+h2 { font-size: 1.4rem; margin: 40px 0 6px; }
+
+.horario {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 6px;
+}
+.horario-form { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; flex: 1 1 520px; }
+.horario-lugar { flex: 1 1 200px; width: 0; }   /* width 0 + flex 1: ocupa lo que sobra */
+input[type="time"] {
+  font: inherit;
+  color: var(--tinta);
+  background: var(--blanco);
+  border: 1px solid #A9B5C9;
+  border-radius: 6px;
+  padding: 9px 12px;
+}
+input[type="time"]:focus-visible { outline: 3px solid #3F6FD8; outline-offset: 2px; }
+
+.caja {
+  margin-top: 28px;
+  padding: 4px 20px 20px;
+  background: var(--blanco);
+  border: 1px solid var(--linea);
+  border-radius: 8px;
+}
+.caja h2 { margin-top: 16px; font-size: 1.2rem; }
+
+/* ===== Celular ===== */
+@media (max-width: 640px) {
+  h1 { font-size: 1.7rem; }
+  .tutoria { grid-template-columns: 64px 1fr; }
+  .tutoria-apuntar, .tutoria-acciones { grid-column: 1 / -1; }
+  .tutoria-apuntar { flex-wrap: wrap; }
+  .tutoria-apuntar input[type="text"] { width: auto; flex: 1 1 100%; }
+  .fila { flex-direction: column; gap: 2px; }
+  .fila-materia { text-align: left; }
+}

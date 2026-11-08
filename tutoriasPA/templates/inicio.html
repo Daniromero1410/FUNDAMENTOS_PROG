@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block contenido %}
+  <section class="entrada">
+    <h1>Tutorías UDES</h1>
+    <p class="suave">Entra como estudiante para apuntarte a una tutoría, o como profesor para manejar tus horarios.</p>
+
+    <form method="post" action="/entrar">
+      <input type="hidden" name="rol" value="estudiante">
+      <select name="usuario_id" aria-label="Estudiante">
+        {% for estudiante in estudiantes %}
+          <option value="{{ estudiante.id }}">{{ estudiante.nombre }}</option>
+        {% endfor %}
+      </select>
+      <button class="boton" type="submit">Entrar como estudiante</button>
+    </form>
+
+    <form method="post" action="/entrar">
+      <input type="hidden" name="rol" value="profesor">
+      <select name="usuario_id" aria-label="Profesor">
+        {% for profesor in profesores %}
+          <option value="{{ profesor.id }}">{{ profesor.nombre }}</option>
+        {% endfor %}
+      </select>
+      <button class="boton boton-claro" type="submit">Entrar como profesor</button>
+    </form>
+  </section>
+{% endblock %}

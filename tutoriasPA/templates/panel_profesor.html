@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block contenido %}
+  <div class="encabezado">
+    <h1>Mi panel</h1>
+    <p class="suave">{{ usuario.materia }}</p>
+  </div>
+
+  <h2>Mis horarios</h2>
+  <p class="suave">Se repiten cada semana. Si ya hay estudiantes inscritos, solo puedes cambiar el lugar.</p>
+
+  {% if horarios|length == 0 %}
+    <p class="vacio">Todavía no tienes horarios. Crea el primero abajo.</p>
+  {% endif %}
+
+  <ul class="lista">
+    {% for horario in horarios %}
+      <li class="horario">
+        <form class="horario-form" method="post" action="/panel/horarios/{{ horario.id }}/editar">
+          <select name="dia" aria-label="Día">
+            {% for dia in dias %}
+              <option value="{{ dia }}" {% if dia == horario.dia %}selected{% endif %}>{{ dia }}</option>
+            {% endfor %}
+          </select>
+          <input type="time" name="hora" value="{{ horario.hora }}" aria-label="Hora" required>
+          <input type="text" name="lugar" value="{{ horario.lugar }}" aria-label="Lugar" class="horario-lugar">
+          <button class="boton boton-claro" type="submit">Guardar</button>
+        </form>
+        <form method="post" action="/panel/horarios/{{ horario.id }}/eliminar">
+          <button class="boton boton-peligro" type="submit">Eliminar</button>
+        </form>
+      </li>
+    {% endfor %}
+  </ul>
+
+  <section class="caja">
+    <h2>Nuevo horario</h2>
+    <form class="horario-form" method="post" action="/panel/horarios">
+      <select name="dia" aria-label="Día">
+        {% for dia in dias %}
+          <option value="{{ dia }}">{{ dia }}</option>
+        {% endfor %}
+      </select>
+      <input type="time" name="hora" aria-label="Hora" required>
+      <input type="text" name="lugar" placeholder="Lugar" aria-label="Lugar" class="horario-lugar">
+      <button class="boton" type="submit">Crear horario</button>
+    </form>
+  </section>
+
+  <h2>Estudiantes inscritos</h2>
+
+  {% if inscritos|length == 0 %}
+    <p class="vacio">Nadie se ha inscrito a tus próximas tutorías.</p>
+  {% endif %}
+
+  <ul class="lista">
+    {% for inscrito in inscritos %}
+      <li class="tutoria">
+        <div class="fecha">
+          <span class="fecha-dia">{{ inscrito.dia[:3] }}</span>
+          <span class="fecha-numero">{{ inscrito.fecha[8:] }}</span>
+        </div>
+        <div>
+          <p class="tutoria-hora">{{ inscrito.estudiante_nombre }}</p>
+          <p class="tutoria-detalle">{{ inscrito.hora }}: {{ inscrito.nota }}</p>
+        </div>
+      </li>
+    {% endfor %}
+  </ul>
+{% endblock %}

@@ -10,21 +10,21 @@
     "id": 2,
     "estudiante_id": 2,
     "horario_id": 1,
-    "fecha": "2026-11-10",
+    "fecha": "2026-11-18",
     "nota": "Gradiente y derivada direccional"
   },
   {
     "id": 3,
     "estudiante_id": 3,
     "horario_id": 5,
-    "fecha": "2026-11-10",
+    "fecha": "2026-11-19",
     "nota": "Espacios vectoriales"
   },
   {
     "id": 4,
     "estudiante_id": 3,
     "horario_id": 10,
-    "fecha": "2026-11-13",
+    "fecha": "2026-11-20",
     "nota": "Diccionarios anidados"
   },
   {

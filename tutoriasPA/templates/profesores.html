@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block contenido %}
+  <div class="encabezado">
+    <h1>Profesores</h1>
+    <p class="suave">Elige un profesor para ver sus tutorías de esta semana.</p>
+  </div>
+
+  <ul class="lista">
+    {% for profesor in profesores %}
+      <li>
+        <a class="fila" href="/profesor/{{ profesor.id }}">
+          <span class="fila-nombre">{{ profesor.nombre }}</span>
+          <span class="fila-materia">{{ profesor.materia }}</span>
+        </a>
+      </li>
+    {% endfor %}
+  </ul>
+{% endblock %}
