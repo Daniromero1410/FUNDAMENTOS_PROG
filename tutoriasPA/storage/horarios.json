@@ -1,0 +1,72 @@
+[
+  {
+    "id": 1,
+    "profesor_id": 1,
+    "dia": "Martes",
+    "hora": "10:00",
+    "lugar": "Bloque A, oficina 302"
+  },
+  {
+    "id": 2,
+    "profesor_id": 1,
+    "dia": "Jueves",
+    "hora": "14:00",
+    "lugar": "Bloque A, oficina 302"
+  },
+  {
+    "id": 3,
+    "profesor_id": 2,
+    "dia": "Lunes",
+    "hora": "09:00",
+    "lugar": "Bloque B, sala 105"
+  },
+  {
+    "id": 4,
+    "profesor_id": 2,
+    "dia": "Miércoles",
+    "hora": "15:00",
+    "lugar": "Bloque B, sala 105"
+  },
+  {
+    "id": 5,
+    "profesor_id": 3,
+    "dia": "Martes",
+    "hora": "10:00",
+    "lugar": "Bloque A, oficina 210"
+  },
+  {
+    "id": 6,
+    "profesor_id": 3,
+    "dia": "Viernes",
+    "hora": "10:00",
+    "lugar": "Bloque A, oficina 210"
+  },
+  {
+    "id": 7,
+    "profesor_id": 4,
+    "dia": "Miércoles",
+    "hora": "10:00",
+    "lugar": "Laboratorio de física"
+  },
+  {
+    "id": 8,
+    "profesor_id": 4,
+    "dia": "Jueves",
+    "hora": "16:00",
+    "lugar": "Laboratorio de física"
+  },
+  {
+    "id": 9,
+    "profesor_id": 5,
+    "dia": "Lunes",
+    "hora": "14:00",
+    "lugar": "Sala de sistemas 2"
+  },
+  {
+    "id": 10,
+    "profesor_id": 5,
+    "dia": "Viernes",
+    "hora": "09:00",
+    "lugar": "Sala de sistemas 2"
+  }
+]

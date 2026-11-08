@@ -1,21 +1,30 @@
 import modules.utils as utils
 
-def horarios_de_profesor(profesor_id):
-    profesores = utils.cargar_datos("profesores")
-    if profesor_id not in profesores:
-        return []
-    return profesores[profesor_id]["horarios"]
 
+def horarios_de_profesor(profesor_id):
+    horarios = utils.cargar_datos("horarios")
+    horarios_del_profesor = []
+    for horario in horarios:
+        if horario["profesor_id"] == profesor_id:
+            horarios_del_profesor.append(horario)
+    return horarios_del_profesor
+
+
+# Inscripciones futuras a las tutorías de este profesor
 def ver_inscritos(profesor_id):
     inscripciones = utils.cargar_datos("inscripciones")
+    horarios = utils.cargar_datos("horarios")
     inscritos = []
     for inscripcion in inscripciones:
-        if inscripcion["profesor"] == profesor_id:
-            fecha_hora_tutoria = utils.construir_fecha_hora(inscripcion["fecha"], inscripcion["hora"])
-            if fecha_hora_tutoria >= utils.fecha_hora_actual(): # Solo inscripciones futuras
+        horario = utils.buscar_por_id(horarios, inscripcion["horario_id"])
+        if horario["profesor_id"] == profesor_id:
+            fecha_hora_tutoria = utils.fecha_hora_de_inscripcion(inscripcion, horarios)
+            if fecha_hora_tutoria >= utils.fecha_hora_actual():   # solo inscripciones futuras
                 inscritos.append(inscripcion)
     return inscritos
 
+
+# Devuelve (False, mensaje de error) o (True, lugar limpio)
 def validar_horario(dia, hora, lugar):
     if dia not in utils.DIAS:
         return False, "El día no es válido."
@@ -31,95 +40,92 @@ def validar_horario(dia, hora, lugar):
     if lugar == "":
         return False, "El lugar no puede estar vacío."
     if len(lugar) > utils.MAX_LUGAR:
-        return False, "El lugar no puede pasar de " + str(utils.MAX_LUGAR) + " caracteres."
+        return False, f"El lugar no puede pasar de {utils.MAX_LUGAR} caracteres."
     return True, lugar
+
 
 def crear_horario(profesor_id, dia, hora, lugar):
     horario_valido, mensaje = validar_horario(dia, hora, lugar)
     if not horario_valido:
-        return False, mensaje
+        return False, mensaje   # aquí mensaje es el error
 
-    # Valida que no exista un horario con el mismo día y hora para el profesor
     profesores = utils.cargar_datos("profesores")
-    if profesor_id not in profesores:
+    if utils.buscar_por_id(profesores, profesor_id) is None:
         return False, "Profesor no encontrado."
-    profesor = profesores[profesor_id]
-    for horario in profesor["horarios"]:
-        if horario["dia"] == dia and horario["hora"] == hora:
+
+    # El profesor no puede tener dos horarios el mismo día a la misma hora
+    horarios = utils.cargar_datos("horarios")
+    for horario in horarios:
+        if horario["profesor_id"] == profesor_id and horario["dia"] == dia and horario["hora"] == hora:
             return False, "Ya existe un horario para ese día y hora."
 
-    # Encontrar el número más alto de los horarios existentes para asignar un nuevo ID
-    numero_mayor = 0
-    for otro_id in profesores:
-        for horario in profesores[otro_id]["horarios"]:
-            numero = int(horario["id"][1:]) # Tomamos el número después de la "h"
-            if numero > numero_mayor:
-                numero_mayor = numero
-
     nuevo_horario = {
-        "id": "h" + str(numero_mayor + 1),
+        "id": utils.nuevo_id(horarios),
+        "profesor_id": profesor_id,
         "dia": dia,
         "hora": hora,
-        "lugar": mensaje.strip(), # Guardamos el lugar limpio
+        "lugar": mensaje   # aquí mensaje es el lugar ya limpio
     }
-    profesor["horarios"].append(nuevo_horario)
-    utils.guardar_datos("profesores", profesores)
+    horarios.append(nuevo_horario)
+    utils.guardar_datos("horarios", horarios)
     return True, "Horario creado."
 
-# Profesor revisa si hay inscritos en un horario específico
+
+# True si alguien está inscrito (a futuro) a este horario
 def hay_inscritos(profesor_id, horario_id):
     for inscripcion in ver_inscritos(profesor_id):
-        if inscripcion["horario"] == horario_id:
+        if inscripcion["horario_id"] == horario_id:
             return True
     return False
+
 
 def editar_horario(profesor_id, horario_id, dia, hora, lugar):
     horario_valido, mensaje = validar_horario(dia, hora, lugar)
     if not horario_valido:
         return False, mensaje
 
-    # Validar que el profesor y el horario existan
-    profesores = utils.cargar_datos("profesores")
-    if profesor_id not in profesores:
-        return False, "Ese profesor no existe."
-    profesor = profesores[profesor_id]
-    horario = utils.buscar_horario(profesor, horario_id)
-    if horario is None:
+    # El horario debe existir y ser de este profesor
+    horarios = utils.cargar_datos("horarios")
+    horario = utils.buscar_por_id(horarios, horario_id)
+    if horario is None or horario["profesor_id"] != profesor_id:
         return False, "Ese horario no existe."
 
     cambia_dia_u_hora = False
-    if dia != horario["dia"] or hora != horario["hora"]: # Valida si se cambió el día o la hora
+    if dia != horario["dia"] or hora != horario["hora"]:
         cambia_dia_u_hora = True
 
     if cambia_dia_u_hora:
         if hay_inscritos(profesor_id, horario_id):
             return False, "Hay estudiantes inscritos: por ahora solo puedes cambiar el lugar."
-        for otro_horario in profesor["horarios"]:
-            if otro_horario["id"] != horario_id:
+        for otro_horario in horarios:
+            if otro_horario["profesor_id"] == profesor_id and otro_horario["id"] != horario_id:
                 if otro_horario["dia"] == dia and otro_horario["hora"] == hora:
                     return False, "Ya tienes un horario ese día a esa hora."
 
     horario["dia"] = dia
     horario["hora"] = hora
-    horario["lugar"] = mensaje.strip() # Guardamos el lugar limpio
-    utils.guardar_datos("profesores", profesores)
+    horario["lugar"] = mensaje
+    utils.guardar_datos("horarios", horarios)
     return True, "Horario actualizado."
 
 
 def eliminar_horario(profesor_id, horario_id):
-    profesores = utils.cargar_datos("profesores")
-    if profesor_id not in profesores:
-        return False, "Ese profesor no existe."
-    profesor = profesores[profesor_id]
-
-    horario = utils.buscar_horario(profesor, horario_id)
-    if horario is None:
+    horarios = utils.cargar_datos("horarios")
+    horario = utils.buscar_por_id(horarios, horario_id)
+    if horario is None or horario["profesor_id"] != profesor_id:
         return False, "Ese horario no existe."
 
     if hay_inscritos(profesor_id, horario_id):
         return False, "Hay estudiantes inscritos: no puedes eliminar este horario."
 
-    profesor["horarios"].remove(horario)
-    utils.guardar_datos("profesores", profesores)
+    # Borrado en cascada: las inscripciones viejas de este horario se van con él
+    inscripciones = utils.cargar_datos("inscripciones")
+    inscripciones_restantes = []
+    for inscripcion in inscripciones:
+        if inscripcion["horario_id"] != horario_id:
+            inscripciones_restantes.append(inscripcion)
+
+    horarios.remove(horario)
+    utils.guardar_datos("horarios", horarios)
+    utils.guardar_datos("inscripciones", inscripciones_restantes)
     return True, "Horario eliminado."
-        

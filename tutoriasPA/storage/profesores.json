@@ -1,92 +1,27 @@
-{
-  "gomez": {
+[
+  {
+    "id": 1,
     "nombre": "Prof. Gómez",
-    "materia": "Cálculo Multivariable",
-    "horarios": [
-      {
-        "id": "h1",
-        "dia": "Martes",
-        "hora": "10:00",
-        "lugar": "Bloque A, oficina 302"
-      },
-      {
-        "id": "h2",
-        "dia": "Jueves",
-        "hora": "14:00",
-        "lugar": "Bloque A, oficina 302"
-      }
-    ]
+    "materia": "Cálculo Multivariable"
   },
-  "paredes": {
+  {
+    "id": 2,
     "nombre": "Profa. Paredes",
-    "materia": "Cálculo Multivariable",
-    "horarios": [
-      {
-        "id": "h3",
-        "dia": "Lunes",
-        "hora": "09:00",
-        "lugar": "Bloque B, sala 105"
-      },
-      {
-        "id": "h4",
-        "dia": "Miércoles",
-        "hora": "15:00",
-        "lugar": "Bloque B, sala 105"
-      }
-    ]
+    "materia": "Cálculo Multivariable"
   },
-  "ruiz": {
+  {
+    "id": 3,
     "nombre": "Profa. Ruiz",
-    "materia": "Álgebra Lineal",
-    "horarios": [
-      {
-        "id": "h5",
-        "dia": "Martes",
-        "hora": "10:00",
-        "lugar": "Bloque A, oficina 210"
-      },
-      {
-        "id": "h6",
-        "dia": "Viernes",
-        "hora": "10:00",
-        "lugar": "Bloque A, oficina 210"
-      }
-    ]
+    "materia": "Álgebra Lineal"
   },
-  "martinez": {
+  {
+    "id": 4,
     "nombre": "Prof. Martínez",
-    "materia": "Física Eléctrica",
-    "horarios": [
-      {
-        "id": "h7",
-        "dia": "Miércoles",
-        "hora": "10:00",
-        "lugar": "Laboratorio de física"
-      },
-      {
-        "id": "h8",
-        "dia": "Jueves",
-        "hora": "16:00",
-        "lugar": "Laboratorio de física"
-      }
-    ]
+    "materia": "Física Eléctrica"
   },
-  "torres": {
+  {
+    "id": 5,
     "nombre": "Profa. Torres",
-    "materia": "Fundamentos de Programación",
-    "horarios": [
-      {
-        "id": "h9",
-        "dia": "Lunes",
-        "hora": "14:00",
-        "lugar": "Sala de sistemas 2"
-      },
-      {
-        "id": "h10",
-        "dia": "Viernes",
-        "hora": "09:00",
-        "lugar": "Sala de sistemas 2"
-      }
-    ]
+    "materia": "Fundamentos de Programación"
   }
-}
+]
