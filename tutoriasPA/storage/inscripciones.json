@@ -1,0 +1,47 @@
+[
+  {
+    "id": 1,
+    "estudiante": "Ana",
+    "profesor": "gomez",
+    "horario": "h1",
+    "fecha": "2026-11-10",
+    "hora": "10:00",
+    "nota": "Repaso de integrales dobles"
+  },
+  {
+    "id": 2,
+    "estudiante": "Luis",
+    "profesor": "gomez",
+    "horario": "h1",
+    "fecha": "2026-11-10",
+    "hora": "10:00",
+    "nota": "Gradiente y derivada direccional"
+  },
+  {
+    "id": 3,
+    "estudiante": "Camila",
+    "profesor": "ruiz",
+    "horario": "h5",
+    "fecha": "2026-11-10",
+    "hora": "10:00",
+    "nota": "Espacios vectoriales"
+  },
+  {
+    "id": 4,
+    "estudiante": "Camila",
+    "profesor": "torres",
+    "horario": "h10",
+    "fecha": "2026-11-13",
+    "hora": "09:00",
+    "nota": "Diccionarios anidados"
+  },
+  {
+    "id": 5,
+    "estudiante": "Ana",
+    "profesor": "martinez",
+    "horario": "h8",
+    "fecha": "2026-11-12",
+    "hora": "16:00",
+    "nota": "Circuitos RC"
+  }
+]
