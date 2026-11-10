@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 # ---------------------------------------------------------------
 # ETAPA 1 · Carga y limpia
 # ---------------------------------------------------------------
-df = pd.read_csv('ventas.csv')
+df = pd.read_csv('FUNDAMENTOS_PROG/Taller_csv/ventas.csv')
 print('Filas y columnas:', df.shape)
 print(df.head())
 
