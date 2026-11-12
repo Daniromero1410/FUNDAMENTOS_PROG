@@ -3,36 +3,80 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Tutorías UDES</title>
+  <title>Tutorías · Universidad de Santander</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Public+Sans:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='estilos.css') }}">
 </head>
 <body>
-  <header class="barra">
-    <div class="barra-contenido">
-      <a class="marca" href="/">Tutorías UDES</a>
-      {% if rol == "estudiante" %}
-        <a class="barra-enlace" href="/profesores">Profesores</a>
-        <a class="barra-enlace" href="/mis-tutorias">Mis tutorías</a>
-      {% endif %}
-      {% if rol == "profesor" %}
-        <a class="barra-enlace" href="/panel">Mi panel</a>
-      {% endif %}
+
+  <!-- 1. Barra superior: aviso del proyecto y usuario -->
+  <div class="barra-superior">
+    <div class="contenedor barra-superior-contenido">
+      <span>Proyecto académico · Fundamentos de Programación</span>
       {% if usuario %}
-        <span class="barra-usuario">{{ usuario.nombre }}</span>
-        <a class="barra-enlace" href="/salir">Salir</a>
+        <span>{{ usuario.nombre }} · <a href="/salir">Salir</a></span>
       {% endif %}
+    </div>
+  </div>
+
+  <!-- 2. Encabezado: marca a la izquierda, menú a la derecha -->
+  <header class="cabecera">
+    <div class="contenedor cabecera-contenido">
+      <a class="marca" href="/">Tutorías <span class="marca-u">Universidad de Santander</span></a>
+
+      <nav class="menu" aria-label="Menú principal">
+        <a href="/" {% if request.path == "/" %}class="activo"{% endif %}>Inicio</a>
+        <a href="/profesores" {% if request.path.startswith("/profesor") %}class="activo"{% endif %}>Profesores</a>
+        {% if rol == "estudiante" %}
+          <a href="/mis-tutorias" {% if request.path == "/mis-tutorias" %}class="activo"{% endif %}>Mis tutorías</a>
+        {% endif %}
+        {% if rol == "profesor" %}
+          <a href="/panel" {% if request.path.startswith("/panel") %}class="activo"{% endif %}>Mi panel</a>
+        {% endif %}
+      </nav>
     </div>
   </header>
 
-  <main class="pagina">
+  <!-- 3. Banda del título (cada página pone la suya) -->
+  {% block banda %}{% endblock %}
+
+  <!-- 4. Contenido -->
+  <main class="contenedor pagina">
     {% for categoria, mensaje in get_flashed_messages(with_categories=true) %}
       <p class="aviso {{ categoria }}" role="status">{{ mensaje }}</p>
     {% endfor %}
 
     {% block contenido %}{% endblock %}
   </main>
+
+  <!-- 5. Pie de página en columnas -->
+  <footer class="pie">
+    <div class="contenedor pie-columnas">
+      <div>
+        <p class="pie-titulo">Tutorías</p>
+        <p>Universidad de Santander</p>
+        <p class="pie-pequeno">Proyecto académico de Fundamentos de Programación. No es un sitio oficial de la UDES.</p>
+      </div>
+      <div>
+        <p class="pie-titulo">Enlaces</p>
+        <p><a href="/">Inicio</a></p>
+        <p><a href="/profesores">Profesores</a></p>
+        {% if rol == "estudiante" %}<p><a href="/mis-tutorias">Mis tutorías</a></p>{% endif %}
+        {% if rol == "profesor" %}<p><a href="/panel">Mi panel</a></p>{% endif %}
+      </div>
+      <div>
+        <p class="pie-titulo">Reglas</p>
+        <p>Apúntate a tutorías de los próximos 7 días.</p>
+        <p>Cancela con 3 días o más de anticipación.</p>
+        <p>No puedes tener dos tutorías a la misma hora.</p>
+      </div>
+    </div>
+    <div class="pie-final">
+      <div class="contenedor">Desarrollado por Juan Rosas y Juan Diego · Ingeniería de Software · UDES</div>
+    </div>
+  </footer>
+
 </body>
 </html>

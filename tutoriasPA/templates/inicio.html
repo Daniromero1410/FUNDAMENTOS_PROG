@@ -1,28 +1,82 @@
-{% extends "base.html" %}
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tutorías · Universidad de Santander</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='estilos.css') }}">
+</head>
+<body>
 
-{% block contenido %}
-  <section class="entrada">
-    <h1>Tutorías UDES</h1>
-    <p class="suave">Entra como estudiante para apuntarte a una tutoría, o como profesor para manejar tus horarios.</p>
+  <!-- 1. Barra superior: aviso del proyecto y usuario -->
+  <div class="barra-superior">
+    <div class="contenedor barra-superior-contenido">
+      <span>Proyecto académico · Fundamentos de Programación</span>
+      {% if usuario %}
+        <span>{{ usuario.nombre }} · <a href="/salir">Salir</a></span>
+      {% endif %}
+    </div>
+  </div>
 
-    <form method="post" action="/entrar">
-      <input type="hidden" name="rol" value="estudiante">
-      <select name="usuario_id" aria-label="Estudiante">
-        {% for estudiante in estudiantes %}
-          <option value="{{ estudiante.id }}">{{ estudiante.nombre }}</option>
-        {% endfor %}
-      </select>
-      <button class="boton" type="submit">Entrar como estudiante</button>
-    </form>
+  <!-- 2. Encabezado: marca a la izquierda, menú a la derecha -->
+  <header class="cabecera">
+    <div class="contenedor cabecera-contenido">
+      <a class="marca" href="/">Tutorías <span class="marca-u">Universidad de Santander</span></a>
 
-    <form method="post" action="/entrar">
-      <input type="hidden" name="rol" value="profesor">
-      <select name="usuario_id" aria-label="Profesor">
-        {% for profesor in profesores %}
-          <option value="{{ profesor.id }}">{{ profesor.nombre }}</option>
-        {% endfor %}
-      </select>
-      <button class="boton boton-claro" type="submit">Entrar como profesor</button>
-    </form>
-  </section>
-{% endblock %}
+      <nav class="menu" aria-label="Menú principal">
+        <a href="/" {% if request.path == "/" %}class="activo"{% endif %}>Inicio</a>
+        <a href="/profesores" {% if request.path.startswith("/profesor") %}class="activo"{% endif %}>Profesores</a>
+        {% if rol == "estudiante" %}
+          <a href="/mis-tutorias" {% if request.path == "/mis-tutorias" %}class="activo"{% endif %}>Mis tutorías</a>
+        {% endif %}
+        {% if rol == "profesor" %}
+          <a href="/panel" {% if request.path.startswith("/panel") %}class="activo"{% endif %}>Mi panel</a>
+        {% endif %}
+      </nav>
+    </div>
+  </header>
+
+  <!-- 3. Banda del título (cada página pone la suya) -->
+  {% block banda %}{% endblock %}
+
+  <!-- 4. Contenido -->
+  <main class="contenedor pagina">
+    {% for categoria, mensaje in get_flashed_messages(with_categories=true) %}
+      <p class="aviso {{ categoria }}" role="status">{{ mensaje }}</p>
+    {% endfor %}
+
+    {% block contenido %}{% endblock %}
+  </main>
+
+  <!-- 5. Pie de página en columnas -->
+  <footer class="pie">
+    <div class="contenedor pie-columnas">
+      <div>
+        <p class="pie-titulo">Tutorías</p>
+        <p>Universidad de Santander</p>
+        <p class="pie-pequeno">Proyecto académico de Fundamentos de Programación. No es un sitio oficial de la UDES.</p>
+      </div>
+      <div>
+        <p class="pie-titulo">Enlaces</p>
+        <p><a href="/">Inicio</a></p>
+        <p><a href="/profesores">Profesores</a></p>
+        {% if rol == "estudiante" %}<p><a href="/mis-tutorias">Mis tutorías</a></p>{% endif %}
+        {% if rol == "profesor" %}<p><a href="/panel">Mi panel</a></p>{% endif %}
+      </div>
+      <div>
+        <p class="pie-titulo">Reglas</p>
+        <p>Apúntate a tutorías de los próximos 7 días.</p>
+        <p>Cancela con 3 días o más de anticipación.</p>
+        <p>No puedes tener dos tutorías a la misma hora.</p>
+      </div>
+    </div>
+    <div class="pie-final">
+      <div class="contenedor">Desarrollado por Juan Rosas y Juan Diego · Ingeniería de Software · UDES</div>
+    </div>
+  </footer>
+
+</body>
+</html>
