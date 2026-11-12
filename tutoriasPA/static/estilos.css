@@ -1,17 +1,21 @@
-/* ===== Colores y fuentes (cámbialos aquí y cambia todo el sitio) ===== */
+/* ===== Colores y fuentes =====
+   Identidad UDES (Manual de Marca): azul 014C97 y dorado CEA284, fuente Open Sans */
 :root {
+  --azul: #014C97;
+  --azul-oscuro: #013A74;
+  --dorado: #CEA284;
   --papel: #F4F6FA;
   --blanco: #FFFFFF;
-  --tinta: #17233B;
+  --tinta: #1B2B40;
   --tinta-suave: #56657F;
   --linea: #D8DFEA;
-  --marcador: #FFDE59;       /* el amarillo de resaltador: solo para las fechas */
+  --marcador: var(--dorado);
   --ok: #1D6642;
   --ok-fondo: #E3F2E9;
   --error: #A3231C;
   --error-fondo: #FBE9E7;
-  --fuente-titulos: "Bricolage Grotesque", system-ui, sans-serif;
-  --fuente-texto: "Public Sans", system-ui, sans-serif;
+  --fuente-titulos: "Open Sans", system-ui, sans-serif;
+  --fuente-texto: "Open Sans", system-ui, sans-serif;
 }
 
 /* ===== Base ===== */
@@ -28,7 +32,8 @@ body {
 
 h1, h2 {
   font-family: var(--fuente-titulos);
-  letter-spacing: -0.02em;
+  color: var(--azul);
+  letter-spacing: -0.01em;
   line-height: 1.15;
 }
 
@@ -38,50 +43,122 @@ a { color: var(--tinta); }
 
 .suave { color: var(--tinta-suave); margin: 0; }
 
-/* ===== Barra de arriba ===== */
-.barra {
-  background: var(--tinta);
-  color: var(--blanco);
+/* ===== Contenedor ===== */
+.contenedor {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding-left: 20px;
+  padding-right: 20px;
 }
 
-.barra-contenido {
-  max-width: 760px;
-  margin: 0 auto;
-  padding: 14px 20px;
+/* ===== 1. Barra superior ===== */
+.barra-superior {
+  background: var(--azul-oscuro);
+  color: #DCE6F2;
+  font-size: 0.85rem;
+}
+.barra-superior-contenido {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px 24px;
+  justify-content: space-between;
+  gap: 2px 16px;
+  padding-top: 6px;
+  padding-bottom: 6px;
+}
+.barra-superior a { color: var(--blanco); }
+.barra-superior a:focus-visible { outline-color: var(--dorado); }
+
+/* ===== 2. Encabezado: marca y menú ===== */
+.cabecera {
+  background: var(--blanco);
+  border-bottom: 4px solid var(--dorado);
+}
+.cabecera-contenido {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 32px;
   align-items: center;
+  justify-content: space-between;
+  padding-top: 14px;
+  padding-bottom: 10px;
 }
 
 .marca {
-  font-family: var(--fuente-titulos);
   font-weight: 700;
-  font-size: 1.2rem;
-  color: var(--blanco);
+  font-size: 1.35rem;
+  color: var(--azul);
   text-decoration: none;
-  margin-right: auto;
 }
+.marca-u { font-weight: 400; font-size: 0.9rem; color: var(--tinta-suave); margin-left: 6px; }
 
-.barra a { color: var(--blanco); }
-.barra-enlace { text-decoration: none; padding: 4px 0; border-bottom: 2px solid transparent; }
-.barra-enlace:hover { border-bottom-color: var(--marcador); }
-.barra-usuario { color: #C3CCDD; font-size: 0.95rem; }
-
-/* ===== Contenido ===== */
-.pagina {
-  max-width: 760px;
-  margin: 0 auto;
-  padding: 32px 20px 64px;
+.menu { display: flex; flex-wrap: wrap; gap: 4px 24px; }
+.menu a {
+  color: var(--tinta);
+  text-decoration: none;
+  font-weight: 600;
+  padding: 6px 0;
+  border-bottom: 3px solid transparent;
 }
+.menu a:hover { color: var(--azul); }
+.menu a.activo { color: var(--azul); border-bottom-color: var(--azul); }
 
-.volver {
-  display: inline-block;
-  margin-bottom: 18px;
-  color: var(--tinta-suave);
+/* ===== 3. Banner (inicio) y banda del título (páginas internas) ===== */
+.hero {
+  background: var(--azul);
+  color: var(--blanco);
+  padding: 56px 0 60px;
 }
+.hero h1 { color: var(--blanco); font-size: 2.6rem; max-width: 640px; margin-bottom: 12px; }
+.hero p { font-size: 1.15rem; max-width: 560px; margin: 0 0 24px; color: #E6EEF7; }
 
-.encabezado { margin-bottom: 24px; }
+.banda {
+  background: var(--azul);
+  color: var(--blanco);
+  padding: 22px 0 28px;
+}
+.banda h1 { color: var(--blanco); margin: 8px 0 4px; }
+.banda p { margin: 0; color: #DCE6F2; }
+
+.migas { font-size: 0.9rem; color: #DCE6F2; }
+.migas a { color: var(--blanco); }
+.migas a:focus-visible, .hero a:focus-visible { outline-color: var(--dorado); }
+
+/* ===== 4. Contenido y secciones ===== */
+.pagina { padding-top: 32px; padding-bottom: 64px; }
+
+.seccion { margin-bottom: 48px; }
+.seccion-titulo { margin: 0 0 16px; font-size: 1.5rem; }
+.seccion-cabecera { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; }
+.seccion-cabecera .seccion-titulo { margin-bottom: 16px; }
+
+.cuadricula { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.cuadricula-2 { grid-template-columns: repeat(2, 1fr); }
+
+.tarjeta {
+  background: var(--blanco);
+  border: 1px solid var(--linea);
+  border-top: 4px solid var(--dorado);
+  border-radius: 8px;
+  padding: 20px;
+}
+.tarjeta h3 { margin: 0 0 6px; font-size: 1.1rem; color: var(--azul); }
+.paso { margin: 0 0 8px; font-size: 2rem; font-weight: 700; color: var(--dorado); line-height: 1; }
+
+/* Tarjeta de evento */
+.evento {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  padding: 16px;
+  background: var(--blanco);
+  border: 1px solid var(--linea);
+  border-radius: 8px;
+  color: inherit;
+  text-decoration: none;
+}
+.evento:hover { border-color: var(--azul); }
+.evento .fecha { flex: 0 0 64px; }
+.evento-titulo { margin: 0 0 2px; font-weight: 700; color: var(--azul); }
 
 /* ===== Avisos (flash) ===== */
 .aviso {
@@ -105,7 +182,7 @@ input[type="text"], select {
 }
 
 input[type="text"]:focus-visible, select:focus-visible, button:focus-visible, a:focus-visible {
-  outline: 3px solid #3F6FD8;
+  outline: 3px solid var(--azul);
   outline-offset: 2px;
 }
 
@@ -113,31 +190,27 @@ input[type="text"]:focus-visible, select:focus-visible, button:focus-visible, a:
   font: inherit;
   font-weight: 600;
   cursor: pointer;
-  border: 1px solid var(--tinta);
+  border: 1px solid var(--azul);
   border-radius: 6px;
   padding: 9px 16px;
-  background: var(--tinta);
+  background: var(--azul);
   color: var(--blanco);
 }
-.boton:hover { background: #26375A; }
+.boton:hover { background: var(--azul-oscuro); }
 
-.boton-claro { background: var(--blanco); color: var(--tinta); }
+.boton-dorado { background: var(--dorado); border-color: var(--dorado); color: var(--tinta); text-decoration: none; display: inline-block; }
+.boton-dorado:hover { background: #BE9272; border-color: #BE9272; }
+
+.boton-claro { background: var(--blanco); color: var(--azul); }
 .boton-claro:hover { background: var(--papel); }
 
 .boton-peligro { background: var(--blanco); color: var(--error); border-color: var(--error); }
 .boton-peligro:hover { background: var(--error-fondo); }
 
-/* ===== Entrada ===== */
-.entrada {
-  max-width: 420px;
-  margin: 6vh auto 0;
-  padding: 28px;
-  background: var(--blanco);
-  border: 1px solid var(--linea);
-  border-radius: 8px;
-}
-.entrada form { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
-.entrada select { flex: 1 1 140px; }
+/* ===== Entrar (tarjetas del inicio) ===== */
+.entrada { display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
+.entrada .suave { margin-bottom: 6px; }
+.entrada select { width: 100%; }
 
 /* ===== Lista de profesores ===== */
 .lista { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--linea); }
@@ -177,7 +250,7 @@ input[type="text"]:focus-visible, select:focus-visible, button:focus-visible, a:
   line-height: 1.1;
 }
 .fecha-dia { display: block; font-size: 0.9rem; font-weight: 600; }
-.fecha-numero { display: block; font-family: var(--fuente-titulos); font-size: 2rem; font-weight: 800; }
+.fecha-numero { display: block; font-family: var(--fuente-titulos); font-size: 2rem; font-weight: 700; }
 
 .tutoria-hora { margin: 0; font-family: var(--fuente-titulos); font-size: 1.25rem; font-weight: 700; }
 .tutoria-detalle { margin: 0; color: var(--tinta-suave); }
@@ -219,7 +292,7 @@ input[type="time"] {
   border-radius: 6px;
   padding: 9px 12px;
 }
-input[type="time"]:focus-visible { outline: 3px solid #3F6FD8; outline-offset: 2px; }
+input[type="time"]:focus-visible { outline: 3px solid var(--azul); outline-offset: 2px; }
 
 .caja {
   margin-top: 28px;
@@ -230,9 +303,29 @@ input[type="time"]:focus-visible { outline: 3px solid #3F6FD8; outline-offset: 2
 }
 .caja h2 { margin-top: 16px; font-size: 1.2rem; }
 
+/* ===== 5. Pie de página ===== */
+.pie { background: var(--azul); color: #E6EEF7; border-top: 4px solid var(--dorado); }
+.pie-columnas {
+  display: grid;
+  grid-template-columns: 2fr 1fr 2fr;
+  gap: 24px;
+  padding-top: 32px;
+  padding-bottom: 28px;
+}
+.pie p { margin: 0 0 6px; }
+.pie a { color: var(--blanco); }
+.pie a:focus-visible { outline-color: var(--dorado); }
+.pie-titulo { font-weight: 700; color: var(--blanco); font-size: 1.05rem; }
+.pie-pequeno { font-size: 0.85rem; opacity: 0.85; }
+.pie-final { background: var(--azul-oscuro); font-size: 0.85rem; padding: 10px 0; }
+
 /* ===== Celular ===== */
 @media (max-width: 640px) {
   h1 { font-size: 1.7rem; }
+  .hero { padding: 36px 0 40px; }
+  .hero h1 { font-size: 2rem; }
+  .cuadricula, .cuadricula-2, .pie-columnas { grid-template-columns: 1fr; }
+  .cabecera-contenido { flex-direction: column; align-items: flex-start; }
   .tutoria { grid-template-columns: 64px 1fr; }
   .tutoria-apuntar, .tutoria-acciones { grid-column: 1 / -1; }
   .tutoria-apuntar { flex-wrap: wrap; }
