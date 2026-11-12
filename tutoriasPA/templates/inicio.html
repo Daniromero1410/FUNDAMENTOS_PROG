@@ -1,82 +1,101 @@
-<!doctype html>
-<html lang="es">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Tutorías · Universidad de Santander</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="{{ url_for('static', filename='estilos.css') }}">
-</head>
-<body>
+{% extends "base.html" %}
 
-  <!-- 1. Barra superior: aviso del proyecto y usuario -->
-  <div class="barra-superior">
-    <div class="contenedor barra-superior-contenido">
-      <span>Proyecto académico · Fundamentos de Programación</span>
-      {% if usuario %}
-        <span>{{ usuario.nombre }} · <a href="/salir">Salir</a></span>
+{% block banda %}
+  <!-- Banner principal -->
+  <section class="hero">
+    <div class="contenedor">
+      <h1>Agenda tu tutoría con un profesor</h1>
+      <p>Elige un horario de los próximos 7 días, cuéntale qué quieres repasar y listo.</p>
+      {% if rol == "estudiante" %}
+        <a class="boton boton-dorado" href="/profesores">Ver profesores</a>
+      {% elif rol == "profesor" %}
+        <a class="boton boton-dorado" href="/panel">Ir a mi panel</a>
+      {% else %}
+        <a class="boton boton-dorado" href="#entrar">Entrar</a>
       {% endif %}
     </div>
-  </div>
+  </section>
+{% endblock %}
 
-  <!-- 2. Encabezado: marca a la izquierda, menú a la derecha -->
-  <header class="cabecera">
-    <div class="contenedor cabecera-contenido">
-      <a class="marca" href="/">Tutorías <span class="marca-u">Universidad de Santander</span></a>
-
-      <nav class="menu" aria-label="Menú principal">
-        <a href="/" {% if request.path == "/" %}class="activo"{% endif %}>Inicio</a>
-        <a href="/profesores" {% if request.path.startswith("/profesor") %}class="activo"{% endif %}>Profesores</a>
-        {% if rol == "estudiante" %}
-          <a href="/mis-tutorias" {% if request.path == "/mis-tutorias" %}class="activo"{% endif %}>Mis tutorías</a>
-        {% endif %}
-        {% if rol == "profesor" %}
-          <a href="/panel" {% if request.path.startswith("/panel") %}class="activo"{% endif %}>Mi panel</a>
-        {% endif %}
-      </nav>
-    </div>
-  </header>
-
-  <!-- 3. Banda del título (cada página pone la suya) -->
-  {% block banda %}{% endblock %}
-
-  <!-- 4. Contenido -->
-  <main class="contenedor pagina">
-    {% for categoria, mensaje in get_flashed_messages(with_categories=true) %}
-      <p class="aviso {{ categoria }}" role="status">{{ mensaje }}</p>
-    {% endfor %}
-
-    {% block contenido %}{% endblock %}
-  </main>
-
-  <!-- 5. Pie de página en columnas -->
-  <footer class="pie">
-    <div class="contenedor pie-columnas">
-      <div>
-        <p class="pie-titulo">Tutorías</p>
-        <p>Universidad de Santander</p>
-        <p class="pie-pequeno">Proyecto académico de Fundamentos de Programación. No es un sitio oficial de la UDES.</p>
+{% block contenido %}
+  <!-- Cómo funciona -->
+  <section class="seccion">
+    <h2 class="seccion-titulo">Cómo funciona</h2>
+    <div class="cuadricula">
+      <div class="tarjeta">
+        <p class="paso">1</p>
+        <h3>Elige un profesor</h3>
+        <p class="suave">Mira sus horarios de los próximos 7 días.</p>
       </div>
-      <div>
-        <p class="pie-titulo">Enlaces</p>
-        <p><a href="/">Inicio</a></p>
-        <p><a href="/profesores">Profesores</a></p>
-        {% if rol == "estudiante" %}<p><a href="/mis-tutorias">Mis tutorías</a></p>{% endif %}
-        {% if rol == "profesor" %}<p><a href="/panel">Mi panel</a></p>{% endif %}
+      <div class="tarjeta">
+        <p class="paso">2</p>
+        <h3>Apúntate con una nota</h3>
+        <p class="suave">Cuéntale qué quieres repasar. Puedes editar la nota cuando quieras.</p>
       </div>
-      <div>
-        <p class="pie-titulo">Reglas</p>
-        <p>Apúntate a tutorías de los próximos 7 días.</p>
-        <p>Cancela con 3 días o más de anticipación.</p>
-        <p>No puedes tener dos tutorías a la misma hora.</p>
+      <div class="tarjeta">
+        <p class="paso">3</p>
+        <h3>Cancela si no puedes ir</h3>
+        <p class="suave">Hasta 3 días antes de la tutoría.</p>
       </div>
     </div>
-    <div class="pie-final">
-      <div class="contenedor">Desarrollado por Juan Rosas y Juan Diego · Ingeniería de Software · UDES</div>
-    </div>
-  </footer>
+  </section>
 
-</body>
-</html>
+  <!-- Próximas tutorías (tarjetas tipo "Eventos") -->
+  <section class="seccion">
+    <div class="seccion-cabecera">
+      <h2 class="seccion-titulo">Próximas tutorías</h2>
+      <a href="/profesores">Ver profesores</a>
+    </div>
+
+    {% if tutorias|length == 0 %}
+      <p class="vacio">No hay tutorías en los próximos 7 días.</p>
+    {% endif %}
+
+    <div class="cuadricula">
+      {% for tutoria in tutorias %}
+        <a class="evento" href="/profesor/{{ tutoria.profesor_id }}">
+          <div class="fecha">
+            <span class="fecha-dia">{{ tutoria.dia[:3] }}</span>
+            <span class="fecha-numero">{{ tutoria.fecha[8:] }}</span>
+          </div>
+          <div>
+            <p class="evento-titulo">{{ tutoria.profesor_nombre }}</p>
+            <p class="tutoria-detalle">{{ tutoria.hora }} · {{ tutoria.lugar }}</p>
+          </div>
+        </a>
+      {% endfor %}
+    </div>
+  </section>
+
+  <!-- Entrar (solo si nadie ha entrado) -->
+  {% if usuario is none %}
+    <section class="seccion" id="entrar">
+      <h2 class="seccion-titulo">Entrar</h2>
+      <div class="cuadricula cuadricula-2">
+        <form class="tarjeta entrada" method="post" action="/entrar">
+          <h3>Estudiantes</h3>
+          <p class="suave">Apúntate a una tutoría y revisa las tuyas.</p>
+          <input type="hidden" name="rol" value="estudiante">
+          <select name="usuario_id" aria-label="Estudiante">
+            {% for estudiante in estudiantes %}
+              <option value="{{ estudiante.id }}">{{ estudiante.nombre }}</option>
+            {% endfor %}
+          </select>
+          <button class="boton" type="submit">Entrar como estudiante</button>
+        </form>
+
+        <form class="tarjeta entrada" method="post" action="/entrar">
+          <h3>Profesores</h3>
+          <p class="suave">Maneja tus horarios y mira quién se inscribió.</p>
+          <input type="hidden" name="rol" value="profesor">
+          <select name="usuario_id" aria-label="Profesor">
+            {% for profesor in profesores %}
+              <option value="{{ profesor.id }}">{{ profesor.nombre }}</option>
+            {% endfor %}
+          </select>
+          <button class="boton boton-claro" type="submit">Entrar como profesor</button>
+        </form>
+      </div>
+    </section>
+  {% endif %}
+{% endblock %}

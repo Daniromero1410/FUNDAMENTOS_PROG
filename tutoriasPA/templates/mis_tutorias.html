@@ -1,11 +1,16 @@
 {% extends "base.html" %}
 
-{% block contenido %}
-  <div class="encabezado">
-    <h1>Mis tutorías</h1>
-    <p class="suave">Puedes cancelar hasta 3 días antes.</p>
-  </div>
+{% block banda %}
+  <section class="banda">
+    <div class="contenedor">
+      <nav class="migas" aria-label="Ruta"><a href="/">Inicio</a> / <span>Mis tutorías</span></nav>
+      <h1>Mis tutorías</h1>
+      <p>Puedes cancelar hasta 3 días antes.</p>
+    </div>
+  </section>
+{% endblock %}
 
+{% block contenido %}
   {% if tutorias|length == 0 %}
     <p class="vacio">No tienes tutorías próximas. <a href="/profesores">Buscar un profesor</a></p>
   {% endif %}

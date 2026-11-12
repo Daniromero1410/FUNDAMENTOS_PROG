@@ -1,11 +1,16 @@
 {% extends "base.html" %}
 
-{% block contenido %}
-  <div class="encabezado">
-    <h1>Mi panel</h1>
-    <p class="suave">{{ usuario.materia }}</p>
-  </div>
+{% block banda %}
+  <section class="banda">
+    <div class="contenedor">
+      <nav class="migas" aria-label="Ruta"><a href="/">Inicio</a> / <span>Mi panel</span></nav>
+      <h1>Mi panel</h1>
+      <p>{{ usuario.materia }}</p>
+    </div>
+  </section>
+{% endblock %}
 
+{% block contenido %}
   <h2>Mis horarios</h2>
   <p class="suave">Se repiten cada semana. Si ya hay estudiantes inscritos, solo puedes cambiar el lugar.</p>
 
