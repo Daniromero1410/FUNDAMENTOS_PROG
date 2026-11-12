@@ -1,11 +1,16 @@
 {% extends "base.html" %}
 
-{% block contenido %}
-  <div class="encabezado">
-    <h1>Profesores</h1>
-    <p class="suave">Elige un profesor para ver sus tutorías de esta semana.</p>
-  </div>
+{% block banda %}
+  <section class="banda">
+    <div class="contenedor">
+      <nav class="migas" aria-label="Ruta"><a href="/">Inicio</a> / <span>Profesores</span></nav>
+      <h1>Profesores</h1>
+      <p>Elige un profesor para ver sus tutorías de esta semana.</p>
+    </div>
+  </section>
+{% endblock %}
 
+{% block contenido %}
   <ul class="lista">
     {% for profesor in profesores %}
       <li>
