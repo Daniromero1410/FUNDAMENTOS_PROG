@@ -1,0 +1,60 @@
+import pandas as pd
+
+datos = {
+    "producto": ["Arroz", "Leche", "Pan", "Queso", "Arroz", "Leche"],
+    "categoria": ["Granos", "Lacteos", "Panaderia", "Lacteos", "Granos", "Lacteos"],
+    "precio": [4000, 3500, 2000, 8000, 4500, 3000]
+}
+
+df = pd.DataFrame(datos)
+
+print("Tabla original:")
+print(df)
+
+print("\n1. Columnas:")
+print(df.columns)
+
+
+
+print("\n2.1 Productos con precio mayor a 4000:")
+print(df[df["precio"] > 4000])
+
+print("\n2.2 Productos con precio menor o igual a 3500:")
+print(df[df["precio"] <= 3500])
+
+print("\n2.3 Productos de la categoria Lacteos:")
+print(df[df["categoria"] == "Lacteos"])
+
+
+print("\n3. Productos que cuestan 4000 pesos o menos:")
+print(df[df["precio"] <= 4000])
+
+
+df["precio_con_descuento"] = df["precio"] * 0.9
+
+print("\n4. Tabla con el precio con descuento:")
+print(df)
+
+
+print("\n5. Precio promedio por categoria:")
+promedio = df.groupby("categoria")["precio"].mean()
+print(promedio)
+
+
+print("\n6. Cantidad de productos por categoria:")
+conteo = df["categoria"].value_counts()
+print(conteo)
+
+
+print("\n7. Estadisticas de los precios:")
+print("Precio minimo:", df["precio"].min())
+print("Precio maximo:", df["precio"].max())
+print("Precio promedio:", df["precio"].mean())
+
+
+print("\n8. Estadisticas de precios por categoria:")
+resumen = df.groupby("categoria")["precio"].agg(
+    ["min", "max", "mean"]
+)
+print(resumen)
+

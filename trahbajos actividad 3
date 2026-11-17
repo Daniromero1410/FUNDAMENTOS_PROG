@@ -1,0 +1,89 @@
+
+import pandas as pd
+import matplotlib.pyplot as plt
+from io import StringIO
+
+# Crear un archivo CSV de ejemplo
+datos_csv = """producto,categoria,ciudad,ventas,unidades
+Arroz,Granos,Bucaramanga,120000,30
+Leche,Lacteos,Bucaramanga,95000,25
+Pan,Panaderia,Floridablanca,70000,40
+Queso,Lacteos,Giron,150000,15
+Arroz,Granos,Giron,110000,28
+Leche,Lacteos,Floridablanca,105000,27
+Pan,Panaderia,Bucaramanga,85000,45
+Queso,Lacteos,Bucaramanga,175000,18
+Arroz,Granos,Floridablanca,130000,32
+Leche,Lacteos,Giron,90000,22
+Pan,Panaderia,Giron,75000,38
+Queso,Lacteos,Floridablanca,160000,16
+Galletas,Snacks,Bucaramanga,60000,50
+Galletas,Snacks,Giron,55000,45
+Jugo,Bebidas,Floridablanca,80000,35
+Jugo,Bebidas,Bucaramanga,90000,39
+Galletas,Snacks,,65000,48
+Jugo,Bebidas,Giron,,31
+Pan,Panaderia,Bucaramanga,88000,
+Queso,Lacteos,Giron,155000,17
+"""
+
+df = pd.read_csv(StringIO(datos_csv))
+
+print("TABLA ORIGINAL")
+print(df)
+
+print("\nINFORMACION GENERAL")
+df.info()
+
+print("\nTAMAÑO DE LA TABLA")
+print(df.shape)
+
+
+print("\nDATOS FALTANTES")
+print(df.isnull().sum())
+
+df = df.dropna()
+
+print("\nTABLA DESPUES DE LA LIMPIEZA")
+print(df)
+
+print("\nDATOS FALTANTES DESPUES DE LIMPIAR")
+print(df.isnull().sum())
+
+ventas_filtradas = df[df["ventas"] > 80000]
+
+print("\nVENTAS MAYORES A 80000")
+print(ventas_filtradas)
+
+resultado = ventas_filtradas.groupby("categoria")["ventas"].sum()
+
+print("\nVENTAS TOTALES POR CATEGORIA")
+print(resultado)
+
+categoria_mayor = resultado.idxmax()
+valor_mayor = resultado.max()
+
+print("\nRESULTADO DEL ANALISIS")
+print("La categoria con mayores ventas fue:", categoria_mayor)
+print("Total de ventas:", valor_mayor)
+
+resultado.plot(kind="bar")
+
+plt.title("Ventas por categoria")
+plt.xlabel("Categoria")
+plt.ylabel("Total de ventas")
+
+# Mostrar la grafica
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.show()
+
+print("\nCONCLUSION")
+
+print("Al analizar las ventas mayores a 80000,")
+print("se encontro que la categoria Lacteos obtuvo")
+print("el mayor resultado, con 840000 en ventas.")
+
+print("La limpieza de los datos permitio trabajar")
+print("con informacion completa y el grafico")
+print("facilito la comparacion entre categorias.")
